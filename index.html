@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StitchTrack v6</title>
+<title>StitchTrack v7</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f0f0f;--s1:#1a1a1a;--s2:#222;--s3:#2a2a2a;--bd:#2e2e2e;--ac:#f5a623;--ac2:#4ecdc4;--ac3:#e74c3c;--tx:#e8e8e8;--tx2:#999;--tx3:#555;--gn:#27ae60;--bl:#3498db;--pu:#9b59b6;--yw:#f1c40f;}
@@ -183,13 +183,57 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 }
 /* hidden must come last to override media query display:flex!important */
 .hidden{display:none!important;}
+
+/* ── MOBILE NATIVE APP IMPROVEMENTS ── */
+@media(max-width:680px){
+  body{overflow-x:hidden;}
+  .app{overflow-x:hidden;}
+  .card,.wblock{margin-left:0;margin-right:0;border-radius:8px;}
+  .btn{min-height:40px;padding:9px 16px;border-radius:8px;}
+  .btn-sm{min-height:34px;padding:7px 12px;}
+  .pk{min-height:52px;font-size:20px;border-radius:10px;}
+  .mn-item{min-height:56px;padding:6px 2px;}
+  .mn-ic{font-size:22px;}
+  input,select,textarea{font-size:16px!important;min-height:40px;border-radius:6px;}
+  .sc{padding:10px 12px;border-radius:8px;}
+  .sv{font-size:18px;}
+  .ph{padding:10px 12px 8px;gap:6px;}
+  .content{padding:8px 12px;}
+  .wbh{padding:10px 12px;gap:8px;}
+  .tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px;}
+  table{font-size:12px;}
+  td,th{padding:8px 8px;white-space:nowrap;}
+  .mobile-drawer{width:min(85vw,280px);}
+  .modal{border-radius:16px 16px 0 0!important;}
+  .mobile-topbar{padding-top:env(safe-area-inset-top,10px);min-height:52px;}
+  .mobile-nav{height:calc(58px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);}
+  .main{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px));}
+  .prow{flex-wrap:nowrap;gap:4px;}
+  .prow select{font-size:11px!important;min-height:30px;padding:3px 4px;}
+  .prow input[type=number]{font-size:12px!important;min-height:30px;}
+  .rb{padding:16px 8px;border-radius:10px;}
+  .ri{font-size:28px;}
+  .pin-pad{max-width:230px;gap:10px;}
+}
+
+/* ── SHORTCUTS PANEL ── */
+.shortcuts-panel{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+.shortcuts-box{background:var(--s1);border:1px solid var(--bd);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;}
+@media(min-width:681px){
+  .shortcuts-panel{align-items:center;}
+  .shortcuts-box{border-radius:10px;max-height:90vh;}
+}
+
+/* ── ORDER STICKY CONTEXT BAR ── */
+.order-ctx-bar{position:sticky;top:52px;z-index:60;background:rgba(15,15,15,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+@media(min-width:681px){.order-ctx-bar{top:0;}}
 </style>
 </head>
 <body>
 
 <div class="role-screen" id="roleScreen">
   <div class="role-box">
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:var(--ac);font-weight:600">StitchTrack v5</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:var(--ac);font-weight:600">StitchTrack v7</div>
     <div class="tm3 ts mt4">Production Management</div>
     <div id="rolePicker">
       <div style="font-size:14px;font-weight:600;margin-top:20px">Who are you?</div>
@@ -214,6 +258,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
         <div class="pk" onclick="showRP()" style="font-size:12px">&#8617;</div>
       </div>
       <div id="pinErr" class="tr ts mt8"></div>
+      <div class="tm3 ts mt8" style="font-size:10px">⌨ Type digits on keyboard · Backspace to clear · Esc to go back</div>
     </div>
   </div>
 </div>
@@ -235,7 +280,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
 <div class="mobile-drawer" id="mobileDrawer">
   <div style="padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;">
     <div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ac);font-weight:600">STITCHTRACK v6</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ac);font-weight:600">STITCHTRACK v7</div>
       <div class="role-badge" id="roleBadgeDrawer" style="font-size:9px;background:rgba(245,166,35,.15);color:var(--ac);border-radius:3px;padding:2px 6px;text-transform:uppercase;letter-spacing:1px;margin-top:4px;display:inline-block"></div>
     </div>
     <button onclick="closeDrawer()" style="background:none;border:none;color:var(--tx2);font-size:20px;cursor:pointer">&#215;</button>
@@ -250,7 +295,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
   <aside class="sidebar">
     <div class="logo">
       <span style="font-size:17px;color:var(--ac);min-width:20px">[S]</span>
-      <div><div class="logo-text">STITCHTRACK v6</div><div class="role-badge" id="roleBadge"></div></div>
+      <div><div class="logo-text">STITCHTRACK v7</div><div class="role-badge" id="roleBadge"></div></div>
     </div>
     <nav style="flex:1;overflow-y:auto" id="sideNav"></nav>
     <div class="sync-bar">
@@ -308,7 +353,7 @@ const HOURLY_DEPTS = ['stitching','cutting','printing','helpers'];
 const DAILY_DEPTS  = ['supervisor','office'];
 
 let DB = {
-  settings:{capacity:200,scriptUrl:'',otRate:60},
+  settings:{capacity:200,scriptUrl:'https://script.google.com/macros/s/AKfycbx_Vt6kjkocjd1BhCsYZbflIsusFVIAs5O8K-9-dqAhMIMt0WzUHG-8REBmCRXKzdNkAw/exec',otRate:60},
   timeSlots:JSON.parse(JSON.stringify(DEFAULT_SLOTS)),
   holidays:[],workingSundays:[],
   parts:['Front Panel Stitch','Back Panel Stitch','Sleeve Attach','Collar Rib','Side Seam','Hem',
@@ -364,21 +409,49 @@ function deepMerge(t,s){
 }
 
 // ── SYNC ─────────────────────────────────────────────────────
-function apiCall(action,data){
-  return new Promise(resolve=>{
-    const url=DB.settings.scriptUrl;
-    if(!url){resolve(null);return;}
-    const cb='cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    let src=url+'?action='+encodeURIComponent(action)+'&callback='+cb+'&t='+Date.now();
-    if(data)src+='&payload='+encodeURIComponent(JSON.stringify(data));
-    const s=document.createElement('script');
-    const t=setTimeout(()=>{cleanup();resolve(null);},20000);
-    window[cb]=j=>{cleanup();resolve(j);};
-    function cleanup(){clearTimeout(t);delete window[cb];if(s.parentNode)s.remove();}
-    s.onerror=()=>{cleanup();resolve(null);};
-    s.src=src;document.head.appendChild(s);
-    if(action==='saveAll')fetch(url+'?action=saveAll',{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,data})}).catch(()=>{});
-  });
+/**
+ * apiCall: tries fetch() first (works when hosted / CORS allowed),
+ * falls back to JSONP script tag (works from file:// or cross-origin).
+ * For write actions (saveAll) it uses a no-cors POST as an extra fire-and-forget.
+ */
+function apiCall(action, data) {
+  const url = DB.settings.scriptUrl;
+  if (!url) return Promise.resolve(null);
+
+  // Build GET URL (used for JSONP fallback and GET actions)
+  let getUrl = url + '?action=' + encodeURIComponent(action) + '&t=' + Date.now();
+  if (data) getUrl += '&payload=' + encodeURIComponent(JSON.stringify(data));
+
+  // For save actions: fire a no-cors POST (best effort, can't read response)
+  if (action === 'saveAll' && data) {
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action, data })
+    }).catch(() => {});
+  }
+
+  // Try fetch() with CORS first (works when deployed & accessed from hosted URL)
+  return fetch(getUrl)
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .catch(() => {
+      // JSONP fallback (works from file:// or when fetch blocked by CORS)
+      return new Promise(resolve => {
+        const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const jsonpUrl = getUrl + '&callback=' + cb;
+        const s = document.createElement('script');
+        const t = setTimeout(() => { cleanup(); resolve(null); }, 20000);
+        window[cb] = j => { cleanup(); resolve(j); };
+        function cleanup() { clearTimeout(t); delete window[cb]; if (s.parentNode) s.remove(); }
+        s.onerror = () => { cleanup(); resolve(null); };
+        s.src = jsonpUrl;
+        document.head.appendChild(s);
+      });
+    });
 }
 
 async function manualSync(){
@@ -433,13 +506,31 @@ function selectRole(r){
   const rb2=document.getElementById('roleBadgeDrawer');if(rb2)rb2.textContent=r;
   initApp();
 }
-function showPS(){document.getElementById('rolePicker').classList.add('hidden');document.getElementById('pinScreen').classList.remove('hidden');PE='';updPins();}
-function showRP(){document.getElementById('pinScreen').classList.add('hidden');document.getElementById('rolePicker').classList.remove('hidden');PE='';}
+function showPS(){document.getElementById('rolePicker').classList.add('hidden');document.getElementById('pinScreen').classList.remove('hidden');PE='';updPins();setupPinKeyboard();}
+function showRP(){document.getElementById('pinScreen').classList.add('hidden');document.getElementById('rolePicker').classList.remove('hidden');PE='';removePinKeyboard();}
+let _pinKbHandler=null;
+function setupPinKeyboard(){
+  removePinKeyboard();
+  _pinKbHandler=e=>{
+    if(e.key>='0'&&e.key<='9'){pinKey(e.key);e.preventDefault();}
+    else if(e.key==='Backspace'||e.key==='Delete'){pinBack();e.preventDefault();}
+    else if(e.key==='Escape'){showRP();e.preventDefault();}
+  };
+  document.addEventListener('keydown',_pinKbHandler);
+}
+function removePinKeyboard(){if(_pinKbHandler){document.removeEventListener('keydown',_pinKbHandler);_pinKbHandler=null;}}
 function pinKey(k){
   if(PE.length>=4)return;PE+=k;updPins();
   if(PE.length===4){
-    if(PE===ADMIN_PIN){currentRole='admin';document.getElementById('roleScreen').classList.add('hidden');document.getElementById('roleBadge').textContent='admin';const rb2=document.getElementById('roleBadgeDrawer');if(rb2)rb2.textContent='admin';initApp();}
-    else{document.getElementById('pinErr').textContent='Wrong PIN';setTimeout(()=>{PE='';updPins();document.getElementById('pinErr').textContent='';},900);}
+    if(PE===ADMIN_PIN){
+      removePinKeyboard();
+      currentRole='admin';document.getElementById('roleScreen').classList.add('hidden');
+      document.getElementById('roleBadge').textContent='admin';
+      const rb2=document.getElementById('roleBadgeDrawer');if(rb2)rb2.textContent='admin';initApp();
+    }else{
+      document.getElementById('pinErr').textContent='Wrong PIN';
+      setTimeout(()=>{PE='';updPins();document.getElementById('pinErr').textContent='';},900);
+    }
   }
 }
 function pinBack(){PE=PE.slice(0,-1);updPins();}
@@ -471,6 +562,19 @@ function mkModal(inner,wide){
   d.className='mbg';
   d.onclick=e=>{if(e.target===d)closeModal();};
   d.innerHTML=`<div class="modal${wide?' modal-lg':''}">${inner}</div>`;
+  // Enter key to click the primary action button in modal footer
+  setTimeout(()=>{
+    const inputs=d.querySelectorAll('input:not([type=checkbox])');
+    inputs.forEach(inp=>{
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'&&!e.shiftKey){
+          e.preventDefault();
+          const footer=d.querySelector('.mf');
+          if(footer){const pr=footer.querySelector('.btn-pr');if(pr)pr.click();}
+        }
+      });
+    });
+  },50);
   return d;
 }
 
@@ -603,9 +707,11 @@ function showPage(p){
 }
 
 function initApp(){
-  loadLocal();buildNav();showPage('dashboard');
+  loadLocal();
+  // Auto-set the default script URL if not yet configured
+  if(!DB.settings.scriptUrl){DB.settings.scriptUrl=SCRIPT_URL;saveLocal();}
+  buildNav();showPage('dashboard');
   const rb2=document.getElementById('roleBadgeDrawer');if(rb2)rb2.textContent=currentRole;
-  // Show mobile UI now that we're logged in
   ['mobileTopbar','mobileNav'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('hidden');});
   if(DB.settings.scriptUrl){setSS('ok','Connected');setTimeout(()=>{if(!isSyncing)manualSync();},4000);}
   else setSS('er','Go to Settings to connect');
@@ -982,6 +1088,10 @@ function production(){
   if(!DB.prodLog)DB.prodLog={};if(!DB.prodLog[ds])DB.prodLog[ds]={};
   if(!DB.leaveLog)DB.leaveLog={};if(!DB.leaveLog[ds])DB.leaveLog[ds]={};
 
+  // Active order context: sticky selection that pre-fills all new entries
+  const activeOrders=DB.orders.filter(o=>o.status==='active');
+  if(!window._pOrd&&activeOrders.length)window._pOrd=activeOrders[0].id;
+
   const hwks=DB.workers.filter(w=>HOURLY_DEPTS.includes(w.dept));
   const dwks=DB.workers.filter(w=>DAILY_DEPTS.includes(w.dept));
 
@@ -1012,8 +1122,8 @@ function production(){
            <td><button data-wid="${w.id}" data-sid="${slot.id}" data-ds="${ds}" onclick="addPR(this)" style="background:rgba(245,166,35,.1);border:1px dashed var(--ac);color:var(--ac);border-radius:3px;padding:2px 6px;font-size:11px;cursor:pointer">+</button></td>`}
         </tr>`;
       }).join('');
-      body=`<div style="overflow-x:auto"><table style="min-width:520px">
-        <thead><tr><th style="width:108px">Slot</th><th style="width:40px">L</th><th>Order</th><th>Part</th><th style="width:62px">Qty</th><th style="width:32px">+</th></tr></thead>
+      body=`<div class="tbl-scroll"><table style="min-width:480px">
+        <thead><tr><th style="width:90px">Slot</th><th style="width:36px">L</th><th>Entries</th><th style="width:28px"></th></tr></thead>
         <tbody>${rows}</tbody></table></div>`;
     } else {
       const ents=DB.prodLog[ds][w.id]['day']||[];const lv=DB.leaveLog[ds][w.id]['day']===true;const tot=ents.reduce((a,e)=>a+(parseInt(e.qty)||0),0);
@@ -1050,6 +1160,15 @@ function production(){
       <button class="btn btn-pr btn-sm" onclick="savePL()">&#128190; Save</button>
     </div>
   </div>
+  <div class="order-ctx-bar">
+    <span class="ts tm3" style="white-space:nowrap">Active Order:</span>
+    <select onchange="window._pOrd=this.value;refreshOrderCtx()" id="pOrdSel" style="flex:1;max-width:280px;font-size:12px;min-height:32px;padding:4px 8px">
+      <option value="">-- All Orders --</option>
+      ${activeOrders.map(o=>`<option value="${H(o.id)}" ${o.id===window._pOrd?'selected':''}>${H(o.id)} — ${H(o.name)}</option>`).join('')}
+    </select>
+    ${window._pOrd?`<span class="badge bg-or ts" style="white-space:nowrap">${H(window._pOrd)}</span>`:''}
+    <span class="ts tm3" style="white-space:nowrap;font-size:10px">Pre-fills order in new rows</span>
+  </div>
   <div class="content">
   <div class="ibox ts mb12">Toggle <strong>L</strong> for slot leave. Use <strong>Full Day Off</strong> switch to mark entire day at once. 3+ slots = Half Day badge shown.</div>
   <div class="stitle">Stitching, Cutting, Printing &amp; Helpers - Hourly</div>
@@ -1062,12 +1181,15 @@ function production(){
 
 function prRow(wid,sid,idx,entry){
   const uid=`${wid}_${sid}_${idx}`;
-  const ordOpts=DB.orders.filter(o=>o.status==='active').map(o=>`<option value="${H(o.id)}" ${o.id===(entry.orderId||'')?'selected':''}>${H(o.id)}</option>`).join('');
+  // Pre-fill order from context if no order set yet
+  const ctxOrd=(entry.orderId||'')||window._pOrd||'';
+  if(ctxOrd&&!entry.orderId){entry.orderId=ctxOrd;updEntDirect(wid,sid,idx,'orderId',ctxOrd);}
+  const ordOpts=DB.orders.filter(o=>o.status==='active').map(o=>`<option value="${H(o.id)}" ${o.id===(entry.orderId||ctxOrd)?'selected':''}>${H(o.id)}</option>`).join('');
   const curPart=H(entry.part||'');
   return`<div class="prow" id="prow_${uid}">
-    <select id="po_${uid}" style="flex:1;font-size:11px;padding:3px" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="orderId" onchange="updEnt(this)"><option value="">Order</option>${ordOpts}</select>
+    <select id="po_${uid}" style="flex:1;font-size:11px;padding:3px" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="orderId" onchange="updEnt(this)"><option value="">Ord</option>${ordOpts}</select>
     <div class="part-search-wrap" id="psw_${uid}">
-      <input type="text" id="pp_${uid}" class="part-search-input" placeholder="Search part..." value="${curPart}"
+      <input type="text" id="pp_${uid}" class="part-search-input" placeholder="Part..." value="${curPart}"
         autocomplete="off"
         data-wid="${wid}" data-sid="${sid}" data-idx="${idx}"
         oninput="partSearch(this)"
@@ -1076,7 +1198,7 @@ function prRow(wid,sid,idx,entry){
         onkeydown="partSearchKey(event,'${uid}')">
       <div class="part-dropdown" id="pd_${uid}" style="display:none"></div>
     </div>
-    <input type="number" min="0" max="9999" placeholder="Qty" value="${entry.qty||''}" id="pq_${uid}" style="width:56px;font-size:12px;padding:3px 4px;text-align:center" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="qty" oninput="updEnt(this)">
+    <input type="number" min="0" max="9999" placeholder="Qty" value="${entry.qty||''}" id="pq_${uid}" style="width:56px;font-size:12px;padding:3px 4px;text-align:center" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="qty" oninput="updEnt(this)" onkeydown="qtyEnterKey(event,'${uid}')">
     <span data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" onclick="remEnt(this)" style="cursor:pointer;color:var(--tx3);padding:0 3px;font-size:15px">&#215;</span>
   </div>`;
 }
@@ -1173,6 +1295,23 @@ function setFullDayLeave(cb){
 }
 
 function savePL(){saveSync();toast('Production log saved!');}
+
+// Refresh just the context bar badge without full page reload
+function refreshOrderCtx(){
+  const sel=document.getElementById('pOrdSel');
+  if(sel)window._pOrd=sel.value;
+  // Update badge next to select
+  const bar=sel?.closest('.order-ctx-bar');
+  if(bar){
+    const old=bar.querySelector('.badge');if(old)old.remove();
+    if(window._pOrd){const b=document.createElement('span');b.className='badge bg-or ts';b.style.whiteSpace='nowrap';b.textContent=window._pOrd;sel.after(b);}
+  }
+}
+
+// Enter in Qty field → save log
+function qtyEnterKey(e,uid){
+  if(e.key==='Enter'){e.preventDefault();savePL();toast('Saved!');}
+}
 
 // ── MATERIALS ─────────────────────────────────────────────────
 function matPage(){
@@ -1524,24 +1663,49 @@ function tsPage(){
 function rstSlots(){if(!confirm('Reset?'))return;DB.timeSlots=JSON.parse(JSON.stringify(DEFAULT_SLOTS));saveSync();showPage('timeslots');toast('Reset done');}
 
 // ── SETTINGS ─────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx_Vt6kjkocjd1BhCsYZbflIsusFVIAs5O8K-9-dqAhMIMt0WzUHG-8REBmCRXKzdNkAw/exec';
+
 function settings(){
+  const connected = !!DB.settings.scriptUrl;
   return`<div class="ph"><div><div class="pt">Settings</div></div></div>
   <div class="content">
-  <div class="card"><div class="ch"><span class="ct">Google Sheets Sync</span><span class="badge ${DB.settings.scriptUrl?'bg-gn':'bg-rd'}">${DB.settings.scriptUrl?'Connected':'Not Connected'}</span></div><div class="cb">
-    <div class="fg"><label>Apps Script Web App URL</label><input id="surl" value="${H(DB.settings.scriptUrl||'')}" placeholder="https://script.google.com/macros/s/.../exec" style="font-family:monospace;font-size:11px"></div>
-    <div class="flex g8 mt8">
-      <button class="btn btn-pr btn-sm" onclick="saveSU()">Save &amp; Connect</button>
-      <button class="btn btn-gh btn-sm" onclick="manualSync()">Sync Now</button>
-      ${DB.settings.scriptUrl?`<button class="btn btn-gh btn-sm" onclick="pushCloud().then(()=>toast('Pushed!'))">Push All</button>`:''}
+
+  <div class="card"><div class="ch"><span class="ct">Google Sheets Sync</span><span class="badge ${connected?'bg-gn':'bg-rd'}">${connected?'Connected':'Not Connected'}</span></div><div class="cb">
+    <div class="sbox ts mb8">
+      <strong>Current Script URL:</strong><br>
+      <span style="font-family:monospace;font-size:10px;word-break:break-all;color:var(--bl)">${H(DB.settings.scriptUrl||SCRIPT_URL)}</span>
+    </div>
+    <div class="fg"><label>Apps Script Web App URL (editable)</label>
+      <input id="surl" value="${H(DB.settings.scriptUrl||SCRIPT_URL)}" placeholder="https://script.google.com/macros/s/.../exec" style="font-family:monospace;font-size:11px">
+    </div>
+    <div class="flex g8 mt8 fw">
+      <button class="btn btn-pr btn-sm" onclick="saveSU()">&#128279; Save &amp; Connect</button>
+      <button class="btn btn-gh btn-sm" onclick="manualSync()">&#x1F504; Sync Now</button>
+      <button class="btn btn-gh btn-sm" onclick="pushCloud().then(()=>toast('Pushed to Google Sheets!'))">&#9650; Push All Data</button>
     </div>
     <div id="surlSt" class="ts mt8 tm3"></div>
+    <hr class="dv">
+    <div class="stitle">Setup Instructions</div>
+    <div style="font-size:12px;color:var(--tx2);line-height:1.7">
+      <div>1. Open <a href="https://script.google.com" target="_blank" style="color:var(--bl)">script.google.com</a> → New Project</div>
+      <div>2. Paste the full contents of <strong>StitchTrack_Script.gs</strong> (provided alongside this app)</div>
+      <div>3. Click <strong>Deploy → New Deployment</strong></div>
+      <div>4. Type: <strong>Web app</strong> | Execute as: <strong>Me</strong> | Who has access: <strong>Anyone</strong></div>
+      <div>5. Copy the deployment URL and paste it above → <strong>Save &amp; Connect</strong></div>
+      <div>6. On first connect, click <strong>Push All Data</strong> to upload everything to Google Sheets</div>
+      <div style="margin-top:8px;padding:8px;background:rgba(245,166,35,.08);border-radius:4px;border:1px solid rgba(245,166,35,.2)">
+        ⚡ After any code change in Apps Script, you must <strong>deploy a new version</strong> and update the URL here.
+      </div>
+    </div>
   </div></div>
+
   <div class="card"><div class="ch"><span class="ct">OT Rate</span></div><div class="cb">
     <div class="fgrid fc2"><div class="fg"><label>Overtime Rate per Hour (Rs.)</label><input type="number" id="otrate" value="${DB.settings.otRate||60}"></div></div>
     <button class="btn btn-pr btn-sm mt8" onclick="DB.settings.otRate=parseInt(document.getElementById('otrate').value)||60;saveSync();toast('OT rate updated!')">Save OT Rate</button>
   </div></div>
+
   ${isAdmin()?`<div class="card"><div class="ch"><span class="ct">Danger Zone</span></div><div class="cb"><div class="flex g8">
-    <button class="btn btn-dn btn-sm" onclick="if(confirm('Clear all local data?')){localStorage.removeItem('stv5');location.reload();}">Reset Local Data</button>
+    <button class="btn btn-dn btn-sm" onclick="if(confirm('Clear all local data? This cannot be undone.')){localStorage.removeItem('stv5');location.reload();}">Reset Local Data</button>
     <button class="btn btn-gh btn-sm" onclick="location.reload()">Switch Role</button>
   </div></div></div>`:''}
   </div>`;
@@ -1569,7 +1733,22 @@ function setMobileNav(page){
 // ── KEYBOARD SHORTCUTS ──────────────────────────────────────
 function setupKeyboardShortcuts(){
   document.addEventListener('keydown',e=>{
-    // Don't fire when typing in input/textarea/select
+    // PIN screen handled separately
+    if(!document.getElementById('roleScreen').classList.contains('hidden'))return;
+
+    // Enter to save in supervisor form inputs
+    if(e.key==='Enter'&&e.target.tagName==='INPUT'){
+      const id=e.target.id||'';
+      if(id.startsWith('act_')||id.startsWith('note_')){
+        e.preventDefault();
+        // Find the confirm button in same card and click it
+        const card=e.target.closest('.card');
+        if(card){const btn=card.querySelector('button[onclick^="saveDO"]');if(btn)btn.click();}
+        return;
+      }
+    }
+
+    // Don't fire nav shortcuts when typing in input/textarea/select
     if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
     if(e.ctrlKey||e.metaKey){
       if(e.key==='k'){e.preventDefault();showKbShortcuts();return;}
@@ -1604,8 +1783,11 @@ function showKbShortcuts(){
     {key:'R',desc:'Reports (Admin)'},
     {key:'N / +',desc:'New Order (on Orders page)'},
     {key:'Ctrl+S',desc:'Save Production Log'},
+    {key:'Enter',desc:'Save in Supervisor / select Part'},
+    {key:'0–9',desc:'PIN entry (on login screen)'},
+    {key:'Backspace',desc:'PIN delete (on login screen)'},
     {key:'Ctrl+K / ?',desc:'Show this panel'},
-    {key:'Esc',desc:'Close modal / this panel'},
+    {key:'Esc',desc:'Close modal / panel / PIN'},
   ];
   const panel=document.createElement('div');
   panel.className='shortcuts-panel';
@@ -1616,19 +1798,27 @@ function showKbShortcuts(){
       <button onclick="this.closest('.shortcuts-panel').remove()" style="background:none;border:none;color:var(--tx2);cursor:pointer;font-size:20px">&#215;</button>
     </div>
     ${shortcuts.map(s=>`<div class="sc-row"><span class="tm2 ts">${s.desc}</span><span><span class="kbd">${s.key}</span></span></div>`).join('')}
-    <div class="ts tm3 mt8">Press <span class="kbd">Esc</span> or click outside to close</div>
+    <div class="ts tm3 mt8">Press <span class="kbd">Esc</span> or tap outside to close</div>
   </div>`;
   document.body.appendChild(panel);
 }
 
 function saveSU(){
-  const url=document.getElementById('surl').value.trim();const st=document.getElementById('surlSt');
+  const url=(document.getElementById('surl')?.value||'').trim()||SCRIPT_URL;
+  const st=document.getElementById('surlSt');
   if(!url){DB.settings.scriptUrl='';saveLocal();setSS('er','Not connected');toast('Cleared');return;}
-  if(!url.startsWith('https://script.google.com')){st.style.color='var(--ac3)';st.textContent='URL must start with https://script.google.com';return;}
-  DB.settings.scriptUrl=url;saveLocal();setSS('sy','Connecting...');st.textContent='Testing...';
+  if(!url.startsWith('https://script.google.com')){if(st){st.style.color='var(--ac3)';st.textContent='URL must start with https://script.google.com';}return;}
+  DB.settings.scriptUrl=url;saveLocal();setSS('sy','Connecting...');if(st)st.textContent='Testing connection...';
   apiCall('ping').then(r=>{
-    if(r&&r.ok){setSS('ok','Connected');st.style.color='var(--gn)';st.textContent='Connected! Uploading data...';toast('Connected!');pushCloud().then(()=>{st.textContent='Connected and data saved to Google Sheets!';});}
-    else{setSS('ok','URL saved');st.style.color='var(--yw)';st.textContent='URL saved. Open from Netlify for sync to work. Data safe locally.';}
+    if(r&&r.ok){
+      setSS('ok','Connected');
+      if(st){st.style.color='var(--gn)';st.textContent='Connected! Uploading data to Google Sheets...';}
+      toast('Connected!');
+      pushCloud().then(()=>{if(st)st.textContent='✅ Connected and synced to Google Sheets!';showPage('settings');});
+    }else{
+      setSS('ok','URL saved');
+      if(st){st.style.color='var(--yw)';st.textContent='URL saved. Host from Netlify/GitHub Pages for live sync. Data is safe locally.';}
+    }
   });
 }
 </script>
