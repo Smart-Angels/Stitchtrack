@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StitchTrack v6</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f0f;--s1:#1a1a1a;--s2:#222;--s3:#2a2a2a;--bd:#2e2e2e;--ac:#f5a623;--ac2:#4ecdc4;--ac3:#e74c3c;--tx:#e8e8e8;--tx2:#999;--tx3:#555;--gn:#27ae60;--bl:#3498db;--pu:#9b59b6;--yw:#f1c40f;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;}
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:210px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0;}
+.main{flex:1;overflow-y:auto;}
+.logo{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;}
+.logo-text{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--ac);}
+.role-badge{font-size:9px;background:rgba(245,166,35,.15);color:var(--ac);border-radius:3px;padding:2px 6px;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.nav-sec{padding:6px 0;border-bottom:1px solid var(--bd);}
+.nav-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--tx3);padding:0 14px 5px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;color:var(--tx2);transition:all .15s;font-size:13px;border-left:2px solid transparent;}
+.nav-item:hover{color:var(--tx);background:rgba(245,166,35,.05);}
+.nav-item.active{color:var(--ac);background:rgba(245,166,35,.1);border-left-color:var(--ac);}
+.sync-bar{padding:9px 14px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:7px;font-size:11px;color:var(--tx3);}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--tx3);flex-shrink:0;}
+.sdot.ok{background:var(--gn);}.sdot.sy{background:var(--ac);animation:pulse 1s infinite;}.sdot.er{background:var(--ac3);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-family:inherit;font-weight:500;transition:all .15s;}
+.btn-pr{background:var(--ac);color:#000;}.btn-pr:hover{background:#e09515;}
+.btn-gh{background:transparent;color:var(--tx2);border:1px solid var(--bd);}.btn-gh:hover{color:var(--tx);border-color:#444;background:var(--s2);}
+.btn-dn{background:transparent;color:var(--ac3);border:1px solid var(--ac3);}.btn-dn:hover{background:rgba(231,76,60,.1);}
+.btn-gn{background:var(--gn);color:#fff;}.btn-bl{background:var(--bl);color:#fff;}
+.btn-sm{padding:4px 9px;font-size:12px;}
+.ph{padding:18px 26px 13px;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--bd);flex-wrap:wrap;gap:8px;}
+.pt{font-size:19px;font-weight:700;}.ps{font-size:12px;color:var(--tx2);margin-top:2px;}
+.ha{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.content{padding:18px 26px;}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:6px;margin-bottom:16px;}
+.ch{padding:11px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.ct{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--tx2);}
+.cb{padding:16px;}
+.sg{display:grid;gap:12px;margin-bottom:18px;}
+.sg4{grid-template-columns:repeat(4,1fr);}
+.sg3{grid-template-columns:repeat(3,1fr);}
+.sg2{grid-template-columns:repeat(2,1fr);}
+.sc{background:var(--s1);border:1px solid var(--bd);border-radius:6px;padding:14px;}
+.sl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);margin-bottom:5px;}
+.sv{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;}
+.ss{font-size:11px;color:var(--tx3);margin-top:2px;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx3);padding:8px 11px;border-bottom:1px solid var(--bd);font-weight:500;}
+td{padding:9px 11px;border-bottom:1px solid var(--bd);font-size:13px;color:var(--tx2);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);color:var(--tx);}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;}
+.fg label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);}
+input,select,textarea{background:var(--bg);border:1px solid var(--bd);color:var(--tx);padding:8px 10px;border-radius:4px;font-family:inherit;font-size:13px;width:100%;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ac);}
+select option{background:var(--s2);}
+.fgrid{display:grid;gap:11px;}
+.fc2{grid-template-columns:1fr 1fr;}.fc3{grid-template-columns:1fr 1fr 1fr;}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;text-transform:uppercase;}
+.bg-gn{background:rgba(39,174,96,.15);color:var(--gn);}
+.bg-or{background:rgba(245,166,35,.15);color:var(--ac);}
+.bg-bl{background:rgba(52,152,219,.15);color:var(--bl);}
+.bg-rd{background:rgba(231,76,60,.15);color:var(--ac3);}
+.bg-pu{background:rgba(155,89,182,.15);color:var(--pu);}
+.bg-yw{background:rgba(241,196,15,.15);color:var(--yw);}
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:center;justify-content:center;padding:12px;}
+.modal{background:var(--s1);border:1px solid var(--bd);border-radius:8px;width:580px;max-width:100%;max-height:92vh;overflow-y:auto;}
+.modal-lg{width:800px;}
+.mh{padding:15px 20px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;}
+.mt2{font-size:15px;font-weight:700;}
+.mb2{padding:20px;}
+.mf{padding:13px 20px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:9px;}
+.xbtn{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:22px;line-height:1;}
+.pb{background:var(--bg);border-radius:2px;height:5px;overflow:hidden;}
+.pf{height:100%;border-radius:2px;background:var(--ac);}
+.pf.gn{background:var(--gn);}.pf.rd{background:var(--ac3);}.pf.bl{background:var(--bl);}
+hr.dv{border:none;border-top:1px solid var(--bd);margin:14px 0;}
+.tl{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{background:var(--s2);border:1px solid var(--bd);border-radius:3px;padding:3px 7px;font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;}
+.tag-x{cursor:pointer;color:var(--tx3);font-size:14px;}.tag-x:hover{color:var(--ac3);}
+.toast{position:fixed;bottom:18px;right:18px;background:var(--s1);border:1px solid var(--bd);border-left:3px solid var(--ac);padding:10px 15px;border-radius:4px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;max-width:300px;}
+.toast.show{opacity:1;}.toast.err{border-left-color:var(--ac3);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
+.cal-dh{text-align:center;font-size:10px;text-transform:uppercase;color:var(--tx3);padding:4px;}
+.cal-day{background:var(--s2);border:1px solid var(--bd);border-radius:4px;padding:5px;min-height:82px;cursor:pointer;transition:border-color .15s;}
+.cal-day:hover{border-color:var(--ac);}
+.cal-today{border-color:var(--ac);background:rgba(245,166,35,.06);}
+.cal-hol{background:rgba(231,76,60,.07);border-color:rgba(231,76,60,.25);}
+.cal-ws{background:rgba(39,174,96,.07);border-color:rgba(39,174,96,.3);}
+.cal-other{opacity:.3;}
+.cal-over{border-color:var(--ac3);background:rgba(231,76,60,.1);}
+.cal-dn{font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:2px;cursor:pointer;}
+.cal-cap{font-size:9px;color:var(--tx3);}
+.cal-chip{border-radius:2px;padding:2px 4px;font-size:9px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(52,152,219,.2);color:var(--bl);border:1px solid rgba(52,152,219,.3);}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0;display:inline-block;}
+.tog input{opacity:0;width:0;height:0;}
+.tog-sl{position:absolute;cursor:pointer;inset:0;background:var(--s3);border-radius:20px;transition:.3s;}
+.tog-sl:before{content:'';position:absolute;width:14px;height:14px;left:3px;bottom:3px;background:var(--tx3);border-radius:50%;transition:.3s;}
+.tog input:checked + .tog-sl{background:var(--ac3);}
+.tog input:checked + .tog-sl:before{transform:translateX(16px);background:#fff;}
+.wblock{border:1px solid var(--bd);border-radius:6px;margin-bottom:10px;overflow:hidden;}
+.wbh{background:var(--s2);padding:9px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+.prow{display:flex;gap:6px;align-items:center;margin-bottom:4px;}
+.on-leave{background:rgba(231,76,60,.04);}
+.role-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.role-box{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:32px;width:440px;max-width:95vw;text-align:center;}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;}
+.rb{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:18px 10px;cursor:pointer;transition:all .2s;color:var(--tx2);}
+.rb:hover{border-color:var(--ac);color:var(--ac);background:rgba(245,166,35,.07);}
+.ri{font-size:26px;margin-bottom:6px;}
+.rn{font-size:13px;font-weight:600;}
+.rd{font-size:11px;color:var(--tx3);margin-top:2px;}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin:16px 0;}
+.pin-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--bd);transition:all .2s;}
+.pin-dot.filled{background:var(--ac);border-color:var(--ac);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:200px;margin:0 auto;}
+.pk{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:13px;font-size:17px;cursor:pointer;text-align:center;font-weight:600;}
+.pk:hover{background:var(--s3);border-color:var(--ac);}
+.flex{display:flex;}.fca{align-items:center;}.fjb{justify-content:space-between;}.fw{flex-wrap:wrap;}
+.g4{gap:4px;}.g8{gap:8px;}.g12{gap:12px;}.g16{gap:16px;}
+.mt4{margin-top:4px;}.mt8{margin-top:8px;}.mt12{margin-top:12px;}.mt16{margin-top:16px;}
+.mb4{margin-bottom:4px;}.mb8{margin-bottom:8px;}.mb12{margin-bottom:12px;}
+.tac{text-align:center;}
+.tc{color:var(--ac);}.tg{color:var(--gn);}.tr{color:var(--ac3);}.tb{color:var(--bl);}
+.tm2{color:var(--tx2);}.tm3{color:var(--tx3);}
+.ts{font-size:12px;}.fw6{font-weight:600;}.fw7{font-weight:700;}
+.stitle{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);margin-bottom:10px;}
+.wr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd);}
+.wr:last-child{border-bottom:none;}
+.ibox{background:rgba(52,152,219,.08);border:1px solid rgba(52,152,219,.2);border-radius:4px;padding:9px 13px;color:var(--bl);font-size:13px;margin-bottom:11px;}
+.wbox{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:4px;padding:9px 13px;color:var(--ac3);font-size:13px;margin-bottom:11px;}
+.sbox{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.2);border-radius:4px;padding:9px 13px;color:var(--gn);font-size:13px;margin-bottom:11px;}
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+/* ── PART SEARCH DROPDOWN ── */
+.part-search-wrap{position:relative;flex:2;}
+.part-search-input{width:100%;font-size:11px;padding:3px 6px;}
+.part-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--s2);border:1px solid var(--ac);border-top:none;border-radius:0 0 4px 4px;z-index:50;max-height:160px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.5);}
+.part-opt{padding:5px 8px;font-size:11px;cursor:pointer;color:var(--tx2);display:flex;align-items:center;}
+.part-opt:hover,.part-opt.hi{background:rgba(245,166,35,.15);color:var(--tx);}
+.part-opt-add{color:var(--ac);font-style:italic;}
+
+/* ── KEYBOARD SHORTCUT UI ── */
+.kbd{display:inline-block;background:var(--s3);border:1px solid var(--bd);border-bottom:2px solid var(--tx3);border-radius:3px;padding:1px 5px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--tx3);margin:0 2px;}
+.sc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);}
+.sc-row:last-child{border-bottom:none;}
+
+/* ── MOBILE APP ── */
+@media(max-width:680px){
+  .app{flex-direction:column;height:100vh;}
+  .sidebar{display:none!important;}
+  .main{flex:1;overflow-y:auto;padding-bottom:66px;}
+  .mobile-nav{display:flex!important;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--bd);z-index:90;height:58px;align-items:stretch;}
+  .mn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--tx3);font-size:9px;text-transform:uppercase;letter-spacing:.5px;padding:4px 2px;transition:color .15s;border:none;background:none;-webkit-tap-highlight-color:transparent;}
+  .mn-item.active{color:var(--ac);}
+  .mn-ic{font-size:19px;line-height:1;}
+  .mobile-topbar{display:flex!important;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s1);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:80;}
+  .mobile-title{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ac);font-weight:600;}
+  .mobile-hamburger{background:none;border:none;color:var(--tx2);font-size:22px;cursor:pointer;padding:4px;}
+  .mobile-drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--s1);border-right:1px solid var(--bd);z-index:400;transform:translateX(-100%);transition:transform .25s;overflow-y:auto;}
+  .mobile-drawer.open{transform:translateX(0);}
+  .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:399;display:none;}
+  .drawer-overlay.open{display:block;}
+  .sg4{grid-template-columns:repeat(2,1fr);}
+  .fc2,.fc3{grid-template-columns:1fr;}
+  .ph{padding:12px 14px 10px;}.content{padding:10px 14px;}
+  .pt{font-size:16px;}.sv{font-size:16px;}
+  .modal{max-height:95vh;border-radius:12px 12px 0 0 !important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;width:100%!important;max-width:100%!important;margin:0!important;}
+  .mbg{align-items:flex-end!important;padding:0!important;}
+  .btn{padding:9px 13px;}
+  td,th{padding:7px 8px;}
+  .sg3{grid-template-columns:repeat(2,1fr);}
+  .wbh{flex-direction:column;align-items:flex-start;}
+  table{font-size:12px;}
+  .modal-lg{width:100%!important;}
+}
+@media(min-width:681px){
+  .mobile-nav,.mobile-topbar,.mobile-drawer,.drawer-overlay{display:none!important;}
+}
+/* hidden must come last to override media query display:flex!important */
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<div class="role-screen" id="roleScreen">
+  <div class="role-box">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:var(--ac);font-weight:600">StitchTrack v5</div>
+    <div class="tm3 ts mt4">Production Management</div>
+    <div id="rolePicker">
+      <div style="font-size:14px;font-weight:600;margin-top:20px">Who are you?</div>
+      <div class="role-grid">
+        <div class="rb" onclick="selectRole('admin')"><div class="ri">&#128272;</div><div class="rn">Super Admin</div><div class="rd">Full access</div></div>
+        <div class="rb" onclick="selectRole('manager')"><div class="ri">&#128084;</div><div class="rn">Manager</div><div class="rd">Orders &amp; production</div></div>
+        <div class="rb" onclick="selectRole('supervisor')"><div class="ri">&#128203;</div><div class="rn">Supervisor</div><div class="rd">Daily output &amp; leaves</div></div>
+        <div class="rb" onclick="selectRole('worker')"><div class="ri">&#129525;</div><div class="rn">Worker Entry</div><div class="rd">Log hourly parts</div></div>
+      </div>
+    </div>
+    <div id="pinScreen" class="hidden">
+      <div style="font-size:14px;font-weight:600;margin-top:18px">Enter Admin PIN</div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-pad">
+        <div class="pk" onclick="pinKey('1')">1</div><div class="pk" onclick="pinKey('2')">2</div><div class="pk" onclick="pinKey('3')">3</div>
+        <div class="pk" onclick="pinKey('4')">4</div><div class="pk" onclick="pinKey('5')">5</div><div class="pk" onclick="pinKey('6')">6</div>
+        <div class="pk" onclick="pinKey('7')">7</div><div class="pk" onclick="pinKey('8')">8</div><div class="pk" onclick="pinKey('9')">9</div>
+        <div class="pk" onclick="pinBack()">&#9003;</div><div class="pk" onclick="pinKey('0')">0</div>
+        <div class="pk" onclick="showRP()" style="font-size:12px">&#8617;</div>
+      </div>
+      <div id="pinErr" class="tr ts mt8"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile topbar -->
+<div class="mobile-topbar hidden" id="mobileTopbar">
+  <button class="mobile-hamburger" onclick="toggleDrawer()">&#9776;</button>
+  <div class="mobile-title">STITCHTRACK</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="sdot" id="sdotM" style="width:8px;height:8px;border-radius:50%;background:var(--tx3)"></div>
+    <button onclick="showKbShortcuts()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:16px" title="Shortcuts">&#9000;</button>
+  </div>
+</div>
+
+<!-- Mobile drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- Mobile full nav drawer -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ac);font-weight:600">STITCHTRACK v6</div>
+      <div class="role-badge" id="roleBadgeDrawer" style="font-size:9px;background:rgba(245,166,35,.15);color:var(--ac);border-radius:3px;padding:2px 6px;text-transform:uppercase;letter-spacing:1px;margin-top:4px;display:inline-block"></div>
+    </div>
+    <button onclick="closeDrawer()" style="background:none;border:none;color:var(--tx2);font-size:20px;cursor:pointer">&#215;</button>
+  </div>
+  <nav id="drawerNav" style="padding:8px 0"></nav>
+  <div style="padding:10px 14px;border-top:1px solid var(--bd);margin-top:auto;">
+    <button onclick="manualSync();closeDrawer()" class="btn btn-gh btn-sm" style="width:100%">&#x1F504; Sync Now</button>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <span style="font-size:17px;color:var(--ac);min-width:20px">[S]</span>
+      <div><div class="logo-text">STITCHTRACK v6</div><div class="role-badge" id="roleBadge"></div></div>
+    </div>
+    <nav style="flex:1;overflow-y:auto" id="sideNav"></nav>
+    <div class="sync-bar">
+      <div class="sdot" id="sdot"></div>
+      <span id="slbl" style="flex:1;overflow:hidden;text-overflow:ellipsis;font-size:11px">Local</span>
+      <span onclick="manualSync()" style="cursor:pointer" title="Sync">&#x1F504;</span>
+      <span onclick="showKbShortcuts()" style="cursor:pointer;margin-left:4px" title="Keyboard Shortcuts">&#9000;</span>
+    </div>
+  </aside>
+  <main class="main" id="mainContent"></main>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mobile-nav hidden" id="mobileNav">
+  <button class="mn-item active" id="mn_dashboard" onclick="showPage('dashboard');setMobileNav('dashboard')">
+    <span class="mn-ic">&#128200;</span><span>Dash</span>
+  </button>
+  <button class="mn-item" id="mn_orders" onclick="showPage('orders');setMobileNav('orders')">
+    <span class="mn-ic">&#128203;</span><span>Orders</span>
+  </button>
+  <button class="mn-item" id="mn_production" onclick="showPage('production');setMobileNav('production')">
+    <span class="mn-ic">&#128295;</span><span>Log</span>
+  </button>
+  <button class="mn-item" id="mn_supervisor" onclick="showPage('supervisor');setMobileNav('supervisor')">
+    <span class="mn-ic">&#10003;</span><span>Output</span>
+  </button>
+  <button class="mn-item" id="mn_more" onclick="toggleDrawer()">
+    <span class="mn-ic">&#8943;</span><span>More</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+<div id="mc"></div>
+
+<script>
+const ADMIN_PIN = '1234';
+let currentRole = '', currentPage = 'dashboard', isSyncing = false, lastSync = null;
+
+const DEFAULT_SLOTS = [
+  {id:'s1',label:'9-10am',   start:'09:00',end:'10:00',type:'work'},
+  {id:'s2',label:'10-11am',  start:'10:00',end:'11:00',type:'work'},
+  {id:'s3',label:'11am-12',  start:'11:00',end:'12:00',type:'work'},
+  {id:'s4',label:'12-1pm',   start:'12:00',end:'13:00',type:'work'},
+  {id:'s5',label:'1:30-2:30',start:'13:30',end:'14:30',type:'work'},
+  {id:'s6',label:'2:30-3:30',start:'14:30',end:'15:30',type:'work'},
+  {id:'s7',label:'3:30-4:30',start:'15:30',end:'16:30',type:'work'},
+  {id:'s8',label:'4:30-5pm', start:'16:30',end:'17:00',type:'work'},
+  {id:'s9',label:'OT 5-6pm', start:'17:00',end:'18:00',type:'overtime'},
+  {id:'s10',label:'OT 6-7pm',start:'18:00',end:'19:00',type:'overtime'},
+];
+
+// Departments with hourly slot entries
+const HOURLY_DEPTS = ['stitching','cutting','printing','helpers'];
+// Departments with daily summary only
+const DAILY_DEPTS  = ['supervisor','office'];
+
+let DB = {
+  settings:{capacity:200,scriptUrl:'',otRate:60},
+  timeSlots:JSON.parse(JSON.stringify(DEFAULT_SLOTS)),
+  holidays:[],workingSundays:[],
+  parts:['Front Panel Stitch','Back Panel Stitch','Sleeve Attach','Collar Rib','Side Seam','Hem',
+         'Label Sew','Button Hole','Button Sew','Pocket Attach','Zipper Install','Cuff Attach',
+         'Waistband','Collar Count','QC Check'],
+  departments:[
+    {id:'stitching', name:'Stitching',  share:55},
+    {id:'cutting',   name:'Cutting',    share:12},
+    {id:'printing',  name:'Printing',   share:10},
+    {id:'supervisor',name:'Supervisor', share:8},
+    {id:'office',    name:'Office',     share:8},
+    {id:'helpers',   name:'Helpers',    share:7},
+  ],
+  workers:[
+    {id:'W001',name:'Priya K.',   dept:'stitching', salary:12000},
+    {id:'W002',name:'Meena S.',   dept:'stitching', salary:12500},
+    {id:'W003',name:'Anita R.',   dept:'stitching', salary:11800},
+    {id:'W004',name:'Lakshmi V.',dept:'stitching', salary:13000},
+    {id:'W005',name:'Kavitha M.',dept:'stitching', salary:12200},
+    {id:'W006',name:'Rajan P.',  dept:'cutting',   salary:15000},
+    {id:'W007',name:'Suresh N.', dept:'printing',  salary:16000},
+    {id:'W008',name:'Helper 1',  dept:'helpers',   salary:8000},
+    {id:'W009',name:'Helper 2',  dept:'helpers',   salary:8000},
+    {id:'W010',name:'Divya L.',  dept:'supervisor',salary:22000},
+    {id:'W011',name:'Arjun T.',  dept:'office',    salary:25000},
+  ],
+  orders:[
+    {id:'ORD-001',name:'Basic Crew Neck T-Shirt',client:'RetailCo',totalQty:1000,status:'active',incentivePerPiece:5},
+    {id:'ORD-002',name:'Polo Shirt',client:'SportMax',totalQty:500,status:'active',incentivePerPiece:8},
+  ],
+  schedule:{},
+  prodLog:{},
+  leaveLog:{},
+  dailyOutput:{},
+  materials:{},
+};
+
+// ── STORAGE ──────────────────────────────────────────────────
+function saveLocal(){try{localStorage.setItem('stv5',JSON.stringify(DB));}catch(e){}}
+function loadLocal(){
+  try{
+    const r=localStorage.getItem('stv5');
+    if(r){deepMerge(DB,JSON.parse(r));return true;}
+  }catch(e){}
+  return false;
+}
+function deepMerge(t,s){
+  Object.keys(s).forEach(k=>{
+    if(Array.isArray(s[k]))t[k]=s[k];
+    else if(s[k]&&typeof s[k]==='object'&&t[k]&&typeof t[k]==='object')deepMerge(t[k],s[k]);
+    else t[k]=s[k];
+  });
+}
+
+// ── SYNC ─────────────────────────────────────────────────────
+function apiCall(action,data){
+  return new Promise(resolve=>{
+    const url=DB.settings.scriptUrl;
+    if(!url){resolve(null);return;}
+    const cb='cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    let src=url+'?action='+encodeURIComponent(action)+'&callback='+cb+'&t='+Date.now();
+    if(data)src+='&payload='+encodeURIComponent(JSON.stringify(data));
+    const s=document.createElement('script');
+    const t=setTimeout(()=>{cleanup();resolve(null);},20000);
+    window[cb]=j=>{cleanup();resolve(j);};
+    function cleanup(){clearTimeout(t);delete window[cb];if(s.parentNode)s.remove();}
+    s.onerror=()=>{cleanup();resolve(null);};
+    s.src=src;document.head.appendChild(s);
+    if(action==='saveAll')fetch(url+'?action=saveAll',{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,data})}).catch(()=>{});
+  });
+}
+
+async function manualSync(){
+  if(isSyncing)return;
+  isSyncing=true;setSS('sy','Syncing...');
+  const r=await apiCall('getAll');
+  if(r&&r.savedAt){
+    if((r.orders||[]).length)DB.orders=r.orders;
+    if((r.workers||[]).length)DB.workers=r.workers;
+    if((r.departments||[]).length)DB.departments=r.departments;
+    if((r.parts||[]).length)DB.parts=r.parts;
+    if(r.holidays)DB.holidays=r.holidays;
+    if(r.workingSundays)DB.workingSundays=r.workingSundays;
+    if(r.schedule&&Object.keys(r.schedule).length)DB.schedule=r.schedule;
+    if(r.prodLog&&Object.keys(r.prodLog).length)DB.prodLog=r.prodLog;
+    if(r.leaveLog&&Object.keys(r.leaveLog).length)DB.leaveLog=r.leaveLog;
+    if(r.dailyOutput&&Object.keys(r.dailyOutput).length)DB.dailyOutput=r.dailyOutput;
+    if(r.materials&&Object.keys(r.materials).length)DB.materials=r.materials;
+    if((r.timeSlots||[]).length)DB.timeSlots=r.timeSlots;
+    if(r.settings){if(r.settings.capacity)DB.settings.capacity=r.settings.capacity;if(r.settings.otRate)DB.settings.otRate=r.settings.otRate;}
+    saveLocal();setSS('ok','Synced');showPage(currentPage);toast('Synced!');
+  }else if(r&&!r.savedAt){
+    await pushCloud();setSS('ok','Uploaded');toast('Data uploaded!');
+  }else{
+    setSS('ok',lastSync?'Connected':'Connected (offline)');
+  }
+  isSyncing=false;
+}
+
+async function pushCloud(){
+  if(!DB.settings.scriptUrl)return;
+  setSS('sy','Saving...');
+  try{await apiCall('saveAll',DB);lastSync=new Date();setSS('ok','Saved');}
+  catch(e){setSS('ok','Saved locally');}
+}
+
+function setSS(st,lbl){
+  const cls='sdot '+(st==='ok'?'ok':st==='sy'?'sy':'er');
+  const d=document.getElementById('sdot'),l=document.getElementById('slbl'),dm=document.getElementById('sdotM');
+  if(d)d.className=cls;if(dm)dm.className=cls;
+  if(l)l.textContent=lbl;
+}
+async function saveSync(){saveLocal();if(DB.settings.scriptUrl)try{pushCloud();}catch(e){}}
+
+// ── PIN/ROLE ──────────────────────────────────────────────────
+let PE='';
+function selectRole(r){
+  if(r==='admin'){showPS();return;}
+  currentRole=r;
+  document.getElementById('roleScreen').classList.add('hidden');
+  document.getElementById('roleBadge').textContent=r;
+  const rb2=document.getElementById('roleBadgeDrawer');if(rb2)rb2.textContent=r;
+  initApp();
+}
+function showPS(){document.getElementById('rolePicker').classList.add('hidden');document.getElementById('pinScreen').classList.remove('hidden');PE='';updPins();}
+function showRP(){document.getElementById('pinScreen').classList.add('hidden');document.getElementById('rolePicker').classList.remove('hidden');PE='';}
+function pinKey(k){
+  if(PE.length>=4)return;PE+=k;updPins();
+  if(PE.length===4){
+    if(PE===ADMIN_PIN){currentRole='admin';document.getElementById('roleScreen').classList.add('hidden');document.getElementById('roleBadge').textContent='admin';const rb2=document.getElementById('roleBadgeDrawer');if(rb2)rb2.textContent='admin';initApp();}
+    else{document.getElementById('pinErr').textContent='Wrong PIN';setTimeout(()=>{PE='';updPins();document.getElementById('pinErr').textContent='';},900);}
+  }
+}
+function pinBack(){PE=PE.slice(0,-1);updPins();}
+function updPins(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d)d.className='pin-dot'+(i<PE.length?' filled':'');}}
+
+const isAdmin=()=>currentRole==='admin';
+const isSup=()=>['admin','manager','supervisor'].includes(currentRole);
+const canFin=()=>currentRole==='admin';
+
+// ── HELPERS ───────────────────────────────────────────────────
+const fmt=n=>'Rs.'+Number(n).toLocaleString('en-IN',{maximumFractionDigits:2});
+const fmtN=n=>Number(n).toLocaleString('en-IN');
+const today=()=>new Date().toISOString().split('T')[0];
+const getOrder=id=>DB.orders.find(o=>o.id===id);
+const getWorker=id=>DB.workers.find(w=>w.id===id);
+const getDept=id=>DB.departments.find(d=>d.id===id);
+function H(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(err?' err':'');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+function closeModal(){document.getElementById('mc').innerHTML='';}
+function modal(el){document.getElementById('mc').innerHTML='';document.getElementById('mc').appendChild(el);}
+
+function mkModal(inner,wide){
+  const d=document.createElement('div');
+  d.className='mbg';
+  d.onclick=e=>{if(e.target===d)closeModal();};
+  d.innerHTML=`<div class="modal${wide?' modal-lg':''}">${inner}</div>`;
+  return d;
+}
+
+function isHoliday(ds){
+  const sun=new Date(ds+'T12:00:00').getDay()===0;
+  if(sun&&DB.workingSundays.includes(ds))return false;
+  if(sun)return true;
+  return DB.holidays.includes(ds);
+}
+function toggleDay(ds){
+  const sun=new Date(ds+'T12:00:00').getDay()===0;
+  if(sun){const i=DB.workingSundays.indexOf(ds);if(i>=0)DB.workingSundays.splice(i,1);else DB.workingSundays.push(ds);}
+  else{const i=DB.holidays.indexOf(ds);if(i>=0)DB.holidays.splice(i,1);else DB.holidays.push(ds);}
+  saveSync();showPage('calendar');
+}
+
+function getSchedQty(ds){
+  let t=0;Object.values(DB.schedule).forEach(slots=>slots.forEach(s=>{if(s.date===ds)t+=s.planned;}));return t;
+}
+function getActual(oid,ds){if(!DB.dailyOutput)DB.dailyOutput={};return DB.dailyOutput[ds]?.[oid]?.supervisorActual||0;}
+function getTotalDone(oid){if(!DB.dailyOutput)return 0;return Object.values(DB.dailyOutput).reduce((s,d)=>s+(d[oid]?.supervisorActual||0),0);}
+function getRemaining(oid){const o=getOrder(oid);return o?Math.max(0,o.totalQty-getTotalDone(oid)):0;}
+
+function workDays(yr,mo,upTo){
+  let c=0;const days=new Date(yr,mo+1,0).getDate();const lim=upTo||days;
+  for(let d=1;d<=lim;d++){const ds=yr+'-'+String(mo+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');if(!isHoliday(ds))c++;}
+  return c;
+}
+
+function onLeave(wid,ds,sid){return DB.leaveLog?.[ds]?.[wid]?.[sid]===true;}
+function leaveCount(wid,ds){return Object.values(DB.leaveLog?.[ds]?.[wid]||{}).filter(Boolean).length;}
+function slotHrs(sl){const[sh,sm]=sl.start.split(':').map(Number);const[eh,em]=sl.end.split(':').map(Number);return((eh*60+em)-(sh*60+sm))/60;}
+
+function dayParts(wid,ds){
+  const p={};
+  Object.values((DB.prodLog[ds]||{})[wid]||{}).forEach(entries=>(entries||[]).forEach(e=>{if(e.part)p[e.part]=(p[e.part]||0)+(parseInt(e.qty)||0);}));
+  return p;
+}
+function partDiff(part){
+  let tot=0,cnt=0;
+  DB.workers.filter(w=>HOURLY_DEPTS.includes(w.dept)).forEach(w=>{
+    let wt=0,wc=0;
+    Object.values(DB.prodLog||{}).forEach(dl=>Object.values(dl[w.id]||{}).forEach(entries=>(entries||[]).forEach(e=>{if(e.part===part){wt+=parseInt(e.qty)||0;wc++;}})));
+    if(wc){tot+=wt/wc;cnt++;}
+  });
+  return cnt?1/(tot/cnt):0.05;
+}
+function dayScore(wid,ds){
+  const p=dayParts(wid,ds);
+  return Object.entries(p).reduce((s,[pt,q])=>s+q*partDiff(pt),0);
+}
+function bestPerformer(ds){
+  let best=null,bsc=-1;
+  DB.workers.filter(w=>w.dept==='stitching').forEach(w=>{const sc=dayScore(w.id,ds);if(sc>bsc){bsc=sc;best=w;}});
+  return best&&bsc>0?{worker:best,score:bsc}:null;
+}
+
+function cxShares(oid){
+  const sws=DB.workers.filter(w=>w.dept==='stitching');if(!sws.length)return{};
+  const avgs={};
+  sws.forEach(w=>{let tot=0,cnt=0;Object.values(DB.prodLog||{}).forEach(dl=>Object.values(dl[w.id]||{}).forEach(entries=>(entries||[]).forEach(e=>{if(!e.orderId||e.orderId===oid){tot+=parseInt(e.qty)||0;cnt++;}})));avgs[w.id]=cnt?tot/cnt:20;});
+  let invS=0;const inv={};sws.forEach(w=>{inv[w.id]=1/avgs[w.id];invS+=inv[w.id];});
+  const sh={};sws.forEach(w=>sh[w.id]=inv[w.id]/invS);return sh;
+}
+
+function calcIncentives(oid){
+  const o=getOrder(oid);if(!o)return{};
+  const done=getTotalDone(oid)||o.totalQty;const pool=o.incentivePerPiece*done;
+  const csh=cxShares(oid);const res={};
+  DB.workers.forEach(w=>{
+    const dept=DB.departments.find(d=>d.id===w.dept);const dp=pool*(dept?dept.share/100:0);
+    if(w.dept==='stitching'){const sws=DB.workers.filter(x=>x.dept==='stitching');res[w.id]=dp*(csh[w.id]||(1/sws.length));}
+    else{const dws=DB.workers.filter(x=>x.dept===w.dept);res[w.id]=dp/(dws.length||1);}
+  });return res;
+}
+
+function matCost(oid){
+  if(!DB.materials)return 0;
+  return(DB.materials[oid]||[]).reduce((s,m)=>{const p=m.pricePerUnit||0;const u=(m.entries||[]).reduce((a,e)=>a+(e.used||0),0);const w=(m.entries||[]).reduce((a,e)=>a+(e.wastage||0),0);return s+(u+w)*p;},0);
+}
+
+function autoSched(oid,startDate,qty){
+  const cap=DB.settings.capacity;if(!DB.schedule[oid])DB.schedule[oid]=[];
+  let rem=qty;let d=new Date(startDate+'T12:00:00');let safe=0;
+  while(rem>0&&safe<400){
+    const ds=d.toISOString().split('T')[0];
+    if(!isHoliday(ds)){const al=getSchedQty(ds);const av=cap-al;if(av>0){const add=Math.min(av,rem);const ex=DB.schedule[oid].find(s=>s.date===ds);if(ex)ex.planned+=add;else DB.schedule[oid].push({date:ds,planned:add});rem-=add;}}
+    d=new Date(d.getTime()+86400000);safe++;
+  }
+  DB.schedule[oid].sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+// ── NAV ──────────────────────────────────────────────────────
+const NAV=[
+  {sec:'Overview',items:[{id:'dashboard',ic:'D',label:'Dashboard'},{id:'calendar',ic:'C',label:'Calendar'},{id:'analytics',ic:'A',label:'Analytics'}]},
+  {sec:'Operations',items:[{id:'orders',ic:'O',label:'Orders'},{id:'production',ic:'P',label:'Production Log'},{id:'supervisor',ic:'S',label:'Daily Output',sup:true},{id:'materials',ic:'M',label:'Materials'}]},
+  {sec:'People',items:[{id:'workers',ic:'W',label:'Workers'},{id:'incentives',ic:'I',label:'Incentives',adm:true},{id:'costing',ic:'$',label:'Cost Summary',adm:true}]},
+  {sec:'Reports',items:[{id:'reports',ic:'R',label:'Reports',adm:true}]},
+  {sec:'Config',items:[{id:'parts',ic:'L',label:'Parts Library'},{id:'timeslots',ic:'T',label:'Time Slots'},{id:'settings',ic:'G',label:'Settings'}]},
+];
+
+function buildNav(){
+  const html=NAV.map(sec=>{
+    const items=sec.items.filter(i=>(!i.adm||isAdmin())&&(!i.sup||isSup()));if(!items.length)return'';
+    return`<div class="nav-sec"><div class="nav-lbl">${sec.sec}</div>`+
+      items.map(i=>`<div class="nav-item" id="nav_${i.id}" onclick="showPage('${i.id}')"><span style="min-width:18px;text-align:center;font-weight:600;color:var(--ac)">${i.ic}</span><span>${i.label}</span></div>`).join('')+
+      '</div>';
+  }).join('');
+  document.getElementById('sideNav').innerHTML=html;
+  // Also build drawer nav
+  const dn=document.getElementById('drawerNav');
+  if(dn){dn.innerHTML=NAV.map(sec=>{
+    const items=sec.items.filter(i=>(!i.adm||isAdmin())&&(!i.sup||isSup()));if(!items.length)return'';
+    return`<div class="nav-sec"><div class="nav-lbl" style="padding:0 14px 5px">${sec.sec}</div>`+
+      items.map(i=>`<div class="nav-item" onclick="showPage('${i.id}');setMobileNav('${i.id}');closeDrawer()"><span style="min-width:18px;text-align:center;font-weight:600;color:var(--ac)">${i.ic}</span><span>${i.label}</span></div>`).join('')+
+      '</div>';
+  }).join('');}
+}
+
+function showPage(p){
+  currentPage=p;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  const n=document.getElementById('nav_'+p);if(n)n.classList.add('active');
+  setMobileNav(p);
+  const pages={dashboard,calendar:calPage,analytics,orders,production,supervisor:supPage,materials:matPage,workers,incentives,costing,reports,parts:partsPage,timeslots:tsPage,settings};
+  document.getElementById('mainContent').innerHTML=(pages[p]||dashboard)();
+  // Update mobile topbar subtitle
+  const tb=document.getElementById('mobileTopbar');
+  if(tb){const titleEl=tb.querySelector('.mobile-title');if(titleEl)titleEl.textContent=p.charAt(0).toUpperCase()+p.slice(1).replace(/([A-Z])/g,' $1');}
+}
+
+function initApp(){
+  loadLocal();buildNav();showPage('dashboard');
+  const rb2=document.getElementById('roleBadgeDrawer');if(rb2)rb2.textContent=currentRole;
+  // Show mobile UI now that we're logged in
+  ['mobileTopbar','mobileNav'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('hidden');});
+  if(DB.settings.scriptUrl){setSS('ok','Connected');setTimeout(()=>{if(!isSyncing)manualSync();},4000);}
+  else setSS('er','Go to Settings to connect');
+  setupKeyboardShortcuts();
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────
+function dashboard(){
+  const tod=today();const d=new Date(tod+'T12:00:00');const yr=d.getFullYear(),mo=d.getMonth();
+  const twD=workDays(yr,mo,null);const dwD=workDays(yr,mo,d.getDate());
+  const ao=DB.orders.filter(o=>o.status==='active');
+  let todAct=0;ao.forEach(o=>todAct+=getActual(o.id,tod));
+  const bp=bestPerformer(tod);
+  return `
+  <div class="ph">
+    <div><div class="pt">Dashboard</div><div class="ps">${new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div></div>
+    <div class="ha">
+      ${isSup()?`<button class="btn btn-gh btn-sm" onclick="showPage('supervisor')">&#10003; Daily Output</button>`:''}
+      ${isAdmin()?`<button class="btn btn-pr btn-sm" onclick="openNOM()">+ New Order</button>`:''}
+    </div>
+  </div>
+  <div class="content">
+  <div class="sg sg4">
+    <div class="sc"><div class="sl">Working Days This Month</div><div class="sv tc">${dwD}/${twD}</div><div class="ss">${twD-dwD} remaining</div></div>
+    <div class="sc"><div class="sl">Scheduled Today</div><div class="sv mono">${fmtN(getSchedQty(tod))}</div><div class="ss">of ${DB.settings.capacity} capacity</div></div>
+    <div class="sc"><div class="sl">Actual Today</div><div class="sv mono ${todAct>0?'tg':''}">${fmtN(todAct)}</div><div class="ss">supervisor confirmed</div></div>
+    <div class="sc"><div class="sl">Best Performer Today</div><div class="sv" style="font-size:14px">${bp?H(bp.worker.name):'--'}</div><div class="ss">${bp?'Score: '+bp.score.toFixed(2):''}</div></div>
+  </div>
+  <div class="sg sg2">
+    <div class="card"><div class="ch"><span class="ct">Orders Today</span></div>
+    <table><thead><tr><th>Order</th><th>Planned</th><th>Actual</th><th>Done</th><th>Left</th></tr></thead><tbody>
+    ${ao.map(o=>{const sl=(DB.schedule[o.id]||[]).find(s=>s.date===tod);const pl=sl?sl.planned:0;const ac=getActual(o.id,tod);
+    return`<tr><td><span class="tc fw6">${H(o.id)}</span><br><span class="ts tm2">${H(o.name)}</span></td><td class="mono">${fmtN(pl)}</td><td class="mono ${ac?'tg':''}">${fmtN(ac)}</td><td class="mono">${fmtN(getTotalDone(o.id))}</td><td class="mono">${fmtN(getRemaining(o.id))}</td></tr>`;}).join('')}
+    </tbody></table></div>
+    <div class="card"><div class="ch"><span class="ct">Worker Activity Today</span></div>
+    <table><thead><tr><th>Worker</th><th>Output</th><th>Score</th><th>Leave</th></tr></thead><tbody>
+    ${DB.workers.filter(w=>w.dept==='stitching').map(w=>{const p=dayParts(w.id,tod);const q=Object.values(p).reduce((a,b)=>a+b,0);const sc=dayScore(w.id,tod);const lv=leaveCount(w.id,tod);
+    return`<tr><td class="fw6">${H(w.name)}</td><td class="mono">${q||'--'}</td><td class="mono ${sc>0?'tg':''}">${sc>0?sc.toFixed(2):'--'}</td><td class="mono ${lv>0?'tr':''}">${lv>0?lv+' slots':'--'}</td></tr>`;}).join('')}
+    </tbody></table></div>
+  </div></div>`;
+}
+
+// ── CALENDAR ─────────────────────────────────────────────────
+let calY=new Date().getFullYear(),calM=new Date().getMonth();
+
+function calPage(){
+  const twD=workDays(calY,calM,null);
+  const now=today();const nowD=new Date(now+'T12:00:00');
+  const dwD=(nowD.getFullYear()===calY&&nowD.getMonth()===calM)?workDays(calY,calM,nowD.getDate()):0;
+  return `
+  <div class="ph">
+    <div><div class="pt">Calendar</div></div>
+    <div class="ha">
+      <button class="btn btn-gh btn-sm" onclick="openCapM()">Capacity: ${DB.settings.capacity}/day</button>
+      ${isAdmin()?`<button class="btn btn-pr btn-sm" onclick="openSchedM()">+ Schedule Order</button>`:''}
+    </div>
+  </div>
+  <div class="content">
+  <div class="flex fca fjb mb12 fw g8">
+    <button class="btn btn-gh btn-sm" onclick="calNav(-1)">&#8592; Prev</button>
+    <div class="tac">
+      <div style="font-size:16px;font-weight:700">${new Date(calY,calM).toLocaleDateString('en-IN',{month:'long',year:'numeric'})}</div>
+      <div class="ts tm3">${twD} working days${dwD>0?` | ${dwD} done, ${twD-dwD} remaining`:''}</div>
+    </div>
+    <button class="btn btn-gh btn-sm" onclick="calNav(1)">Next &#8594;</button>
+  </div>
+  <div class="ibox ts mb8">Tap day <strong>number</strong> to toggle holiday/working. Tap day <strong>body</strong> for details and scheduling.</div>
+  <div class="cal-head">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-dh">${d}</div>`).join('')}</div>
+  <div class="cal-grid" id="calGrid">${buildCalGrid()}</div>
+  <div class="mt12 flex g12 fca ts fw">
+    <span><span style="background:rgba(52,152,219,.3);display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px"></span>Scheduled</span>
+    <span><span style="background:rgba(231,76,60,.25);display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px"></span>Holiday</span>
+    <span><span style="background:rgba(39,174,96,.25);display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px"></span>Working Sunday</span>
+  </div>
+  </div>`;
+}
+
+function buildCalGrid(){
+  const first=new Date(calY,calM,1).getDay();
+  const days=new Date(calY,calM+1,0).getDate();
+  const prevD=new Date(calY,calM,0).getDate();
+  const tod=today();
+  const cap=DB.settings.capacity;
+  const out=[];
+
+  // Leading blank days from previous month
+  for(let i=first-1;i>=0;i--)
+    out.push('<div class="cal-day cal-other"><div class="cal-dn">'+(prevD-i)+'</div></div>');
+
+  for(let day=1;day<=days;day++){
+    const mo=String(calM+1).padStart(2,'0');
+    const dy=String(day).padStart(2,'0');
+    const ds=calY+'-'+mo+'-'+dy;
+    const sun=new Date(ds+'T12:00:00').getDay()===0;
+    const isH=isHoliday(ds);
+    const isWS=sun&&DB.workingSundays.includes(ds);
+    const sc=getSchedQty(ds);
+    const isOv=sc>cap&&!isH;
+    let cls='cal-day';
+    if(ds===tod)cls+=' cal-today';
+    if(isH)cls+=' cal-hol';
+    if(isWS)cls+=' cal-ws';
+    if(isOv)cls+=' cal-over';
+
+    // Chips: one per scheduled order
+    let chips='';
+    for(let oi=0;oi<DB.orders.length;oi++){
+      const o=DB.orders[oi];
+      const sl=(DB.schedule[o.id]||[]).find(function(s){return s.date===ds;});
+      if(!sl)continue;
+      const ac=getActual(o.id,ds);
+      chips+='<div class="cal-chip">'+H(o.id.replace('ORD-',''))+':'+sl.planned+(ac?' ok':'')+' </div>';
+    }
+
+    const mark=isH&&!isWS?' H':isWS?' W':'';
+    const capLine=isH&&!isWS?'':'<div class="cal-cap '+(isOv?'tr':'')+'">'+( isOv?'Over':'Free:'+(cap-sc))+'</div>';
+
+    // Key: use data-ds on BOTH the cell body and the number
+    // Cell body click = open detail modal
+    // Number click = toggle holiday (stopPropagation prevents modal)
+    out.push(
+      '<div class="'+cls+'" data-ds="'+ds+'" onclick="calClick(event)">'
+      +'<div class="flex fjb fca">'
+      +'<div class="cal-dn" data-ds="'+ds+'" onclick="calToggle(event)" title="Toggle holiday/working">'
+      +day+mark+'</div>'
+      +(isWS?'<span style="font-size:8px;color:var(--gn)">W</span>':isH?'<span style="font-size:8px;color:var(--ac3)">H</span>':'')
+      +'</div>'
+      +capLine
+      +chips
+      +'</div>'
+    );
+  }
+
+  // Trailing blank days
+  const total=first+days;
+  const rem=total%7===0?0:7-total%7;
+  for(let i=1;i<=rem;i++)
+    out.push('<div class="cal-day cal-other"><div class="cal-dn">'+i+'</div></div>');
+
+  return out.join('');
+}
+
+
+function calClick(event){
+  // Walk up to find the cal-day element
+  let el=event.target;
+  while(el&&!el.dataset.ds&&el.className&&el.className.indexOf&&el.className.indexOf('cal-day')<0){el=el.parentElement;}
+  const ds=el?el.dataset.ds:null;
+  if(!ds)return;
+  // If the number was clicked, calToggle handles it - don't open modal
+  if(event.target.className&&typeof event.target.className==='string'&&event.target.className.indexOf('cal-dn')>=0)return;
+  openCalModal(ds);
+}
+
+function calToggle(event){
+  event.stopPropagation();
+  const ds=event.currentTarget.dataset.ds;
+  if(!ds)return;
+  toggleDay(ds);
+}
+
+function openCalModal(ds){
+  const sc=getSchedQty(ds);const cap=DB.settings.capacity;
+  const isH=isHoliday(ds);
+  const sun=new Date(ds+'T12:00:00').getDay()===0;
+  const isWS=sun&&DB.workingSundays.includes(ds);
+
+  let ordRows='';
+  for(let oi=0;oi<DB.orders.length;oi++){
+    const o=DB.orders[oi];
+    const sl=(DB.schedule[o.id]||[]).find(function(s){return s.date===ds;});
+    if(!sl)continue;
+    const ac=getActual(o.id,ds);
+    ordRows+='<div class="wr">'
+      +'<div><span class="tc fw6">'+H(o.id)+'</span>&nbsp;'+H(o.name)+'</div>'
+      +'<div class="flex fca g8">'
+      +'<span class="mono ts">'+sl.planned+'pc planned</span>'
+      +'<span class="mono ts tg">'+(ac||0)+' done</span>'
+      +(isAdmin()?'<button class="btn btn-gh btn-sm" data-oid="'+H(o.id)+'" data-ds="'+ds+'" onclick="editSlot(this.dataset.oid,this.dataset.ds)">Edit</button>':'')
+      +'</div></div>';
+  }
+
+  const togTxt=isWS?'Mark as Holiday':sun?'Make Working Day':isH?'Make Working Day':'Mark as Holiday';
+  const togCls=(isH&&!isWS)?'btn-gn':'btn-dn';
+  const dateStr=new Date(ds+'T12:00:00').toLocaleDateString('en-IN',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  const inner=
+    '<div class="mh"><div class="mt2">'+dateStr+'</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>'
+    +'<div class="mb2">'
+    +'<div class="mb8">'
+    +'<button class="btn btn-sm '+togCls+'" data-ds="'+ds+'" onclick="toggleDay(this.dataset.ds);closeModal()">'+togTxt+'</button>'
+    +'</div>'
+    +(isH&&!isWS
+      ?'<div class="wbox">This day is a Holiday</div>'
+      :'<div class="ibox">Scheduled: <strong>'+sc+'</strong> / '+cap+' | Available: <strong>'+Math.max(0,cap-sc)+'</strong></div>'
+    )
+    +(!isH||isWS
+      ?(ordRows||'<p class="tm3 ts">No orders scheduled this day.</p>')
+      :''
+    )
+    +(isAdmin()&&(!isH||isWS)
+      ?'<div class="mt12"><button class="btn btn-pr btn-sm" data-ds="'+ds+'" onclick="closeModal();openSchedM(this.dataset.ds)">+ Schedule Order Here</button></div>'
+      :''
+    )
+    +'</div>';
+  modal(mkModal(inner));
+}
+function calNav(dir){calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}showPage('calendar');}
+
+
+
+function editSlot(oid,ds){
+  const sl=(DB.schedule[oid]||[]).find(s=>s.date===ds);if(!sl)return;
+  const inner=`
+    <div class="mh"><div class="mt2">Edit Slot - ${H(oid)} ${ds}</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+    <div class="mb2"><div class="fg"><label>Planned Qty</label><input type="number" id="eslP" value="${sl.planned}"></div></div>
+    <div class="mf">
+      <button class="btn btn-dn btn-sm" onclick="rmSlot('${H(oid)}','${ds}')">Remove</button>
+      <button class="btn btn-gh" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-pr" onclick="svSlot('${H(oid)}','${ds}')">Save</button>
+    </div>`;
+  modal(mkModal(inner));
+}
+function svSlot(oid,ds){const sl=(DB.schedule[oid]||[]).find(s=>s.date===ds);if(sl){sl.planned=parseInt(document.getElementById('eslP').value)||0;}closeModal();saveSync();showPage('calendar');toast('Updated');}
+function rmSlot(oid,ds){DB.schedule[oid]=(DB.schedule[oid]||[]).filter(s=>s.date!==ds);closeModal();saveSync();showPage('calendar');toast('Removed');}
+
+function openCapM(){
+  const inner=`<div class="mh"><div class="mt2">Daily Capacity</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+    <div class="mb2"><div class="fg"><label>Max pieces per day</label><input type="number" id="capV" value="${DB.settings.capacity}"></div></div>
+    <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="DB.settings.capacity=parseInt(document.getElementById('capV').value)||200;closeModal();saveSync();showPage('calendar');toast('Updated')">Save</button></div>`;
+  modal(mkModal(inner));
+}
+
+function openSchedM(prefill){
+  const ao=DB.orders.filter(o=>o.status==='active');if(!ao.length){toast('No active orders');return;}
+  const opts=ao.map(o=>`<option value="${H(o.id)}">${H(o.id)} - ${H(o.name)} (${fmtN(getRemaining(o.id))} left)</option>`).join('');
+  const inner=`
+    <div class="mh"><div class="mt2">Schedule Order</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+    <div class="mb2">
+      <div class="fg"><label>Order</label><select id="schO">${opts}</select></div>
+      <div class="fgrid fc2">
+        <div class="fg"><label>Start Date</label><input type="date" id="schD" value="${prefill||today()}"></div>
+        <div class="fg"><label>Qty (blank = all remaining)</label><input type="number" id="schQ" placeholder="All remaining"></div>
+      </div>
+      <div class="ibox ts mt8">Auto-spreads across working days skipping holidays.</div>
+    </div>
+    <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="doSched()">Schedule</button></div>`;
+  modal(mkModal(inner));
+}
+
+function doSched(){
+  const oid=document.getElementById('schO').value;
+  const sd=document.getElementById('schD').value;
+  const qe=document.getElementById('schQ');
+  const qty=qe&&qe.value?parseInt(qe.value):getRemaining(oid);
+  if(!oid||!sd){toast('Fill required fields');return;}
+  if(qty<=0){toast('No remaining quantity');return;}
+  if(!DB.schedule[oid])DB.schedule[oid]=[];
+  DB.schedule[oid]=DB.schedule[oid].filter(s=>s.date<sd||getActual(oid,s.date)>0);
+  autoSched(oid,sd,qty);
+  closeModal();saveSync();
+  const dO=new Date(sd+'T12:00:00');calY=dO.getFullYear();calM=dO.getMonth();
+  showPage('calendar');toast('Scheduled '+fmtN(qty)+' pieces for '+oid);
+}
+
+// ── ORDERS ───────────────────────────────────────────────────
+function orders(){
+  return `
+  <div class="ph"><div><div class="pt">Orders</div></div><div class="ha">${isAdmin()?`<button class="btn btn-pr" onclick="openNOM()">+ New Order</button>`:''}</div></div>
+  <div class="content">
+  ${DB.orders.map(o=>{const done=getTotalDone(o.id);const pct=o.totalQty?Math.round(done/o.totalQty*100):0;const ns=(DB.schedule[o.id]||[]).filter(s=>s.date>=today()&&!isHoliday(s.date)).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  return`<div class="card mb12"><div class="ch"><div class="flex fca g12"><span class="badge bg-or">${H(o.id)}</span><span class="fw7">${H(o.name)}</span><span class="tm2 ts">- ${H(o.client)}</span></div>
+  <div class="flex g8">${isAdmin()?`<button class="btn btn-gh btn-sm" onclick="openSchedM()">Schedule</button><button class="btn btn-gh btn-sm" onclick="openEOM('${H(o.id)}')">Edit</button>`:''}</div></div>
+  <div class="cb"><div class="sg sg4">
+    <div><div class="sl">Total Qty</div><div class="sv mono">${fmtN(o.totalQty)}</div></div>
+    <div><div class="sl">Completed</div><div class="sv mono tg">${fmtN(done)}</div></div>
+    <div><div class="sl">Remaining</div><div class="sv mono">${fmtN(getRemaining(o.id))}</div></div>
+    ${canFin()?`<div><div class="sl">Incentive/pc</div><div class="sv mono tc">Rs.${o.incentivePerPiece}</div></div>`:'<div></div>'}
+  </div>
+  <div class="pb mt8"><div class="pf ${pct>80?'gn':pct>40?'bl':'rd'}" style="width:${pct}%"></div></div>
+  <div class="ts tm3 mt4">${pct}% complete${ns?` | Next: ${ns.date} (${ns.planned}pc)`:' | Not yet scheduled'}</div>
+  </div></div>`;}).join('')}
+  </div>`;
+}
+
+function openNOM(){
+  const inner=`<div class="mh"><div class="mt2">New Order</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><div class="fgrid fc2">
+    <div class="fg"><label>Order ID</label><input id="noid" placeholder="ORD-003"></div>
+    <div class="fg"><label>Client</label><input id="nocl"></div>
+    <div class="fg" style="grid-column:1/-1"><label>Product Name</label><input id="nonm"></div>
+    <div class="fg"><label>Total Quantity</label><input type="number" id="noqt"></div>
+    ${canFin()?'<div class="fg"><label>Incentive/Piece (Rs.)</label><input type="number" id="noinc" step="0.5"></div>':''}
+  </div></div>
+  <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveNOM()">Create</button></div>`;
+  modal(mkModal(inner));
+}
+function saveNOM(){
+  const id=document.getElementById('noid').value.trim();const nm=document.getElementById('nonm').value.trim();const cl=document.getElementById('nocl').value.trim();const qty=parseInt(document.getElementById('noqt').value);const inc=parseFloat(document.getElementById('noinc')?.value)||0;
+  if(!id||!nm||!qty){toast('Fill required fields');return;}if(DB.orders.find(o=>o.id===id)){toast('ID exists');return;}
+  DB.orders.push({id,name:nm,client:cl,totalQty:qty,status:'active',incentivePerPiece:inc});DB.schedule[id]=[];
+  closeModal();saveSync();showPage('orders');toast('Order created!');
+}
+function openEOM(oid){
+  const o=getOrder(oid);
+  const inner=`<div class="mh"><div class="mt2">Edit Order</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><div class="fgrid fc2">
+    <div class="fg"><label>Order ID <span style="color:var(--ac);font-size:9px">(editable)</span></label><input id="eoid" value="${H(o.id)}" placeholder="ORD-003" style="font-family:monospace"></div>
+    <div class="fg"><label>Client</label><input id="eocl" value="${H(o.client)}"></div>
+    <div class="fg" style="grid-column:1/-1"><label>Product Name</label><input id="eonm" value="${H(o.name)}"></div>
+    <div class="fg"><label>Total Qty</label><input type="number" id="eoqt" value="${o.totalQty}"></div>
+    ${canFin()?`<div class="fg"><label>Incentive/pc</label><input type="number" id="eoinc" value="${o.incentivePerPiece}" step="0.5"></div>`:''}
+    <div class="fg"><label>Status</label><select id="eost"><option value="active" ${o.status==='active'?'selected':''}>Active</option><option value="completed" ${o.status==='completed'?'selected':''}>Completed</option><option value="hold" ${o.status==='hold'?'selected':''}>On Hold</option></select></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveEOM('${H(oid)}')">Save</button></div>`;
+  modal(mkModal(inner));
+}
+function saveEOM(oldId){
+  const o=getOrder(oldId);
+  const newId=document.getElementById('eoid').value.trim();
+  if(!newId){toast('Order ID required',true);return;}
+  if(newId!==oldId&&DB.orders.find(x=>x.id===newId)){toast('ID already exists',true);return;}
+  // Rename ID in all related structures
+  if(newId!==oldId){
+    o.id=newId;
+    if(DB.schedule[oldId]){DB.schedule[newId]=DB.schedule[oldId];delete DB.schedule[oldId];}
+    Object.keys(DB.dailyOutput||{}).forEach(d=>{if(DB.dailyOutput[d][oldId]){DB.dailyOutput[d][newId]=DB.dailyOutput[d][oldId];delete DB.dailyOutput[d][oldId];}});
+    if(DB.materials&&DB.materials[oldId]){DB.materials[newId]=DB.materials[oldId];delete DB.materials[oldId];}
+    // Update prodLog references
+    Object.values(DB.prodLog||{}).forEach(dl=>Object.values(dl).forEach(wl=>Object.values(wl).forEach(sl=>(sl||[]).forEach(e=>{if(e.orderId===oldId)e.orderId=newId;}))));
+  }
+  o.name=document.getElementById('eonm').value;o.client=document.getElementById('eocl').value;o.totalQty=parseInt(document.getElementById('eoqt').value)||o.totalQty;
+  if(document.getElementById('eoinc'))o.incentivePerPiece=parseFloat(document.getElementById('eoinc').value)||0;o.status=document.getElementById('eost').value;
+  closeModal();saveSync();showPage('orders');toast(newId!==oldId?`Renamed to ${newId} & saved!`:'Updated!');
+}
+
+// ── SUPERVISOR ───────────────────────────────────────────────
+function supPage(){
+  const ds=window._supD||today();window._supD=ds;
+  if(!DB.dailyOutput)DB.dailyOutput={};if(!DB.dailyOutput[ds])DB.dailyOutput[ds]={};
+  return`<div class="ph"><div><div class="pt">Daily Output</div><div class="ps">Enter confirmed pieces per order</div></div></div>
+  <div class="content">
+  <div class="fg mb12" style="max-width:200px"><label>Date</label><input type="date" value="${ds}" onchange="window._supD=this.value;showPage('supervisor')"></div>
+  ${DB.orders.filter(o=>o.status==='active').map(o=>{
+    const sl=(DB.schedule[o.id]||[]).find(s=>s.date===ds);const pl=sl?sl.planned:0;const en=DB.dailyOutput[ds][o.id]||{supervisorActual:0,notes:''};
+    return`<div class="card"><div class="ch"><div class="flex fca g8"><span class="badge bg-or">${H(o.id)}</span><span class="fw6">${H(o.name)}</span></div></div>
+    <div class="cb"><div class="sg sg3">
+      <div><div class="sl">Planned Today</div><div class="sv mono">${fmtN(pl)}</div></div>
+      <div><div class="sl">Total Done</div><div class="sv mono tg">${fmtN(getTotalDone(o.id))}</div></div>
+      <div><div class="sl">Remaining</div><div class="sv mono">${fmtN(getRemaining(o.id))}</div></div>
+    </div><hr class="dv"><div class="fgrid fc2">
+      <div class="fg"><label>Actual Completed Today</label><input type="number" id="act_${o.id}" value="${en.supervisorActual||''}" placeholder="Enter actual count"></div>
+      <div class="fg"><label>Notes</label><input id="note_${o.id}" value="${H(en.notes||'')}" placeholder="e.g. Machine issue 1hr"></div>
+    </div><button class="btn btn-pr btn-sm mt8" onclick="saveDO('${H(o.id)}','${ds}')">&#10003; Confirm Output</button>
+    </div></div>`;}).join('')}
+  </div>`;
+}
+
+function saveDO(oid,ds){
+  if(!DB.dailyOutput)DB.dailyOutput={};if(!DB.dailyOutput[ds])DB.dailyOutput[ds]={};
+  const ac=parseInt(document.getElementById('act_'+oid)?.value)||0;const nt=document.getElementById('note_'+oid)?.value||'';
+  DB.dailyOutput[ds][oid]={supervisorActual:ac,notes:nt};
+  const sl=(DB.schedule[oid]||[]).find(s=>s.date===ds);
+  if(sl&&ac<sl.planned){
+    const sf=sl.planned-ac;let d=new Date(ds+'T12:00:00');d=new Date(d.getTime()+86400000);let safe=0;
+    while(safe<60){const ds2=d.toISOString().split('T')[0];if(!isHoliday(ds2)){const al=getSchedQty(ds2);const av=DB.settings.capacity-al;if(av>0){const add=Math.min(av,sf);const ex=(DB.schedule[oid]||[]).find(s=>s.date===ds2);if(ex)ex.planned+=add;else{if(!DB.schedule[oid])DB.schedule[oid]=[];DB.schedule[oid].push({date:ds2,planned:add});}break;}}d=new Date(d.getTime()+86400000);safe++;}
+  }
+  saveSync();toast('Confirmed!');showPage('supervisor');
+}
+
+// ── PRODUCTION LOG ───────────────────────────────────────────
+function production(){
+  const ds=window._pD||today();window._pD=ds;
+  if(!DB.prodLog)DB.prodLog={};if(!DB.prodLog[ds])DB.prodLog[ds]={};
+  if(!DB.leaveLog)DB.leaveLog={};if(!DB.leaveLog[ds])DB.leaveLog[ds]={};
+
+  const hwks=DB.workers.filter(w=>HOURLY_DEPTS.includes(w.dept));
+  const dwks=DB.workers.filter(w=>DAILY_DEPTS.includes(w.dept));
+
+  const buildWorkerBlock=(w,isHourly)=>{
+    if(!DB.prodLog[ds][w.id])DB.prodLog[ds][w.id]={};
+    if(!DB.leaveLog[ds][w.id])DB.leaveLog[ds][w.id]={};
+    const wsl=DB.timeSlots.filter(s=>s.type==='work');
+    const lc=Object.values(DB.leaveLog[ds][w.id]).filter(Boolean).length;
+    const isFD=isHourly&&wsl.every(s=>DB.leaveLog[ds][w.id][s.id]===true);
+    const isHD=!isFD&&lc>=3;
+    const tq=Object.values(DB.prodLog[ds][w.id]).reduce((s,e)=>s+(e||[]).reduce((a,x)=>a+(parseInt(x.qty)||0),0),0);
+    const dept=getDept(w.dept);
+
+    let body='';
+    if(isHourly){
+      const rows=DB.timeSlots.map(slot=>{
+        if(!DB.prodLog[ds][w.id][slot.id])DB.prodLog[ds][w.id][slot.id]=[];
+        const lv=DB.leaveLog[ds][w.id][slot.id]===true;
+        const ents=DB.prodLog[ds][w.id][slot.id];
+        const isOT=slot.type==='overtime';
+        const stot=ents.reduce((a,e)=>a+(parseInt(e.qty)||0),0);
+        const entHtml=ents.length===0?prRow(w.id,slot.id,0,{orderId:'',part:'',qty:''}):ents.map((e,i)=>prRow(w.id,slot.id,i,e)).join('');
+        return`<tr class="${lv?'on-leave':''}" style="${isOT?'background:rgba(245,166,35,.03)':''}">
+          <td><span class="mono ts fw6 ${isOT?'tc':''}">${slot.start}-${slot.end}</span>${isOT?'<span class="badge bg-or" style="font-size:8px;margin-left:3px">OT</span>':''}${stot>0&&!lv?`<br><span class="ts tg mono">${stot}pc</span>`:''}</td>
+          <td><label class="tog" title="Leave"><input type="checkbox" ${lv?'checked':''} data-wid="${w.id}" data-ds="${ds}" data-sid="${slot.id}" onchange="setLeave(this)"><span class="tog-sl"></span></label></td>
+          ${lv?'<td colspan="4" style="color:var(--ac3);font-size:12px;font-style:italic">On leave</td>':
+          `<td colspan="3"><div id="ent_${w.id}_${slot.id}">${entHtml}</div></td>
+           <td><button data-wid="${w.id}" data-sid="${slot.id}" data-ds="${ds}" onclick="addPR(this)" style="background:rgba(245,166,35,.1);border:1px dashed var(--ac);color:var(--ac);border-radius:3px;padding:2px 6px;font-size:11px;cursor:pointer">+</button></td>`}
+        </tr>`;
+      }).join('');
+      body=`<div style="overflow-x:auto"><table style="min-width:520px">
+        <thead><tr><th style="width:108px">Slot</th><th style="width:40px">L</th><th>Order</th><th>Part</th><th style="width:62px">Qty</th><th style="width:32px">+</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>`;
+    } else {
+      const ents=DB.prodLog[ds][w.id]['day']||[];const lv=DB.leaveLog[ds][w.id]['day']===true;const tot=ents.reduce((a,e)=>a+(parseInt(e.qty)||0),0);
+      const entHtml=ents.length===0?prRow(w.id,'day',0,{orderId:'',part:'',qty:''}):ents.map((e,i)=>prRow(w.id,'day',i,e)).join('');
+      body=`<div style="padding:10px 14px">
+        ${!lv?`<div id="ent_${w.id}_day">${entHtml}</div>
+        <button data-wid="${w.id}" data-sid="day" data-ds="${ds}" onclick="addPR(this)" style="margin-top:6px;background:rgba(245,166,35,.1);border:1px dashed var(--ac);color:var(--ac);border-radius:3px;padding:3px 10px;font-size:11px;cursor:pointer">+ Add Entry</button>`
+        :'<p class="ts tr">On leave today</p>'}
+      </div>`;
+    }
+
+    return`<div class="wblock">
+      <div class="wbh">
+        <div class="flex fca g8">
+          <span class="fw6">${H(w.name)}</span>
+          <span class="badge bg-pu ts">${H(dept?dept.name:w.dept)}</span>
+          ${isFD?'<span class="badge bg-rd">Full Day Leave</span>':isHD?'<span class="badge bg-yw">Half Day</span>':lc>0?`<span class="badge bg-or">${lc} slots leave</span>`:''}
+        </div>
+        <div class="flex fca g8">
+          <span class="ts tm3">Full Day Off:</span>
+          <label class="tog" title="Mark full day leave"><input type="checkbox" ${isFD?'checked':''} data-wid="${w.id}" data-ds="${ds}" onchange="setFullDayLeave(this)"><span class="tog-sl"></span></label>
+          ${tq>0?`<span class="ts mono tm2">${tq}pc</span>`:''}
+          ${dayScore(w.id,ds)>0?`<span class="ts mono tg">Sc:${dayScore(w.id,ds).toFixed(1)}</span>`:''}
+        </div>
+      </div>
+      ${body}
+    </div>`;
+  };
+
+  return`<div class="ph">
+    <div><div class="pt">Production Log</div><div class="ps">Parts per slot | Toggle leave per slot or full day</div></div>
+    <div class="ha">
+      <input type="date" value="${ds}" style="width:150px" onchange="window._pD=this.value;showPage('production')">
+      <button class="btn btn-pr btn-sm" onclick="savePL()">&#128190; Save</button>
+    </div>
+  </div>
+  <div class="content">
+  <div class="ibox ts mb12">Toggle <strong>L</strong> for slot leave. Use <strong>Full Day Off</strong> switch to mark entire day at once. 3+ slots = Half Day badge shown.</div>
+  <div class="stitle">Stitching, Cutting, Printing &amp; Helpers - Hourly</div>
+  ${hwks.map(w=>buildWorkerBlock(w,true)).join('')}
+  <hr class="dv">
+  <div class="stitle">Supervisors &amp; Office - Daily Summary</div>
+  ${dwks.map(w=>buildWorkerBlock(w,false)).join('')}
+  </div>`;
+}
+
+function prRow(wid,sid,idx,entry){
+  const uid=`${wid}_${sid}_${idx}`;
+  const ordOpts=DB.orders.filter(o=>o.status==='active').map(o=>`<option value="${H(o.id)}" ${o.id===(entry.orderId||'')?'selected':''}>${H(o.id)}</option>`).join('');
+  const curPart=H(entry.part||'');
+  return`<div class="prow" id="prow_${uid}">
+    <select id="po_${uid}" style="flex:1;font-size:11px;padding:3px" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="orderId" onchange="updEnt(this)"><option value="">Order</option>${ordOpts}</select>
+    <div class="part-search-wrap" id="psw_${uid}">
+      <input type="text" id="pp_${uid}" class="part-search-input" placeholder="Search part..." value="${curPart}"
+        autocomplete="off"
+        data-wid="${wid}" data-sid="${sid}" data-idx="${idx}"
+        oninput="partSearch(this)"
+        onfocus="partSearch(this)"
+        onblur="setTimeout(()=>closePartDrop('${uid}'),200)"
+        onkeydown="partSearchKey(event,'${uid}')">
+      <div class="part-dropdown" id="pd_${uid}" style="display:none"></div>
+    </div>
+    <input type="number" min="0" max="9999" placeholder="Qty" value="${entry.qty||''}" id="pq_${uid}" style="width:56px;font-size:12px;padding:3px 4px;text-align:center" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="qty" oninput="updEnt(this)">
+    <span data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" onclick="remEnt(this)" style="cursor:pointer;color:var(--tx3);padding:0 3px;font-size:15px">&#215;</span>
+  </div>`;
+}
+
+function partSearch(inp){
+  const uid=inp.id.replace('pp_','');
+  const q=inp.value.trim().toLowerCase();
+  const drop=document.getElementById('pd_'+uid);
+  if(!drop)return;
+  const filtered=q?DB.parts.filter(p=>p.toLowerCase().includes(q)):DB.parts.slice(0,12);
+  const showAdd=q&&!DB.parts.find(p=>p.toLowerCase()===q);
+  if(!filtered.length&&!showAdd){drop.style.display='none';return;}
+  drop.innerHTML=[
+    ...filtered.map((p,i)=>`<div class="part-opt${i===0?' hi':''}" data-uid="${uid}" data-part="${H(p)}" onmousedown="selectPart('${uid}','${H(p)}')">${H(p)}</div>`),
+    showAdd?`<div class="part-opt part-opt-add" data-uid="${uid}" data-part="${H(inp.value.trim())}" onmousedown="addAndSelectPart('${uid}','${H(inp.value.trim())}')">${H(inp.value.trim())}</div>`:''
+  ].join('');
+  drop.style.display='block';
+}
+
+function selectPart(uid,part){
+  const inp=document.getElementById('pp_'+uid);
+  if(inp){inp.value=part;const parts=uid.split('_');const wid=parts[0];const sid=parts.slice(1,-1).join('_');const idx=parseInt(parts[parts.length-1]);updEntDirect(wid,sid,idx,'part',part);}
+  closePartDrop(uid);
+}
+
+function addAndSelectPart(uid,part){
+  const decoded=part.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+  if(!DB.parts.includes(decoded)){DB.parts.push(decoded);saveSync();toast('Part added: '+decoded);}
+  selectPart(uid,decoded);
+}
+
+function closePartDrop(uid){
+  const drop=document.getElementById('pd_'+uid);if(drop)drop.style.display='none';
+  // Also save the typed value as the part selection
+  const inp=document.getElementById('pp_'+uid);
+  if(inp&&inp.value){
+    const parts=uid.split('_');
+    const wid=parts[0];const sid=parts.slice(1,-1).join('_');const idx=parseInt(parts[parts.length-1]);
+    updEntDirect(wid,sid,idx,'part',inp.value.trim());
+  }
+}
+
+function partSearchKey(e,uid){
+  const drop=document.getElementById('pd_'+uid);if(!drop||drop.style.display==='none')return;
+  const opts=drop.querySelectorAll('.part-opt');const hi=drop.querySelector('.hi');
+  let idx=[...opts].indexOf(hi);
+  if(e.key==='ArrowDown'){e.preventDefault();if(idx<opts.length-1){if(hi)hi.classList.remove('hi');opts[idx+1].classList.add('hi');}}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(idx>0){if(hi)hi.classList.remove('hi');opts[idx-1].classList.add('hi');}}
+  else if(e.key==='Enter'||e.key==='Tab'){
+    if(hi){e.preventDefault();const pt=hi.dataset.part;if(hi.classList.contains('part-opt-add'))addAndSelectPart(uid,pt);else selectPart(uid,pt);}
+  }
+  else if(e.key==='Escape'){closePartDrop(uid);}
+}
+
+function updEntDirect(wid,sid,idx,field,val){
+  const ds=window._pD||today();
+  if(!DB.prodLog[ds])DB.prodLog[ds]={};if(!DB.prodLog[ds][wid])DB.prodLog[ds][wid]={};if(!DB.prodLog[ds][wid][sid])DB.prodLog[ds][wid][sid]=[];
+  while(DB.prodLog[ds][wid][sid].length<=idx)DB.prodLog[ds][wid][sid].push({orderId:'',part:'',qty:''});
+  DB.prodLog[ds][wid][sid][idx][field]=val;
+}
+
+function updEnt(el){
+  const ds=window._pD||today();const wid=el.dataset.wid;const sid=el.dataset.sid;const idx=parseInt(el.dataset.idx);const field=el.dataset.field;const val=field==='qty'?(parseInt(el.value)||0):el.value;
+  if(!DB.prodLog[ds])DB.prodLog[ds]={};if(!DB.prodLog[ds][wid])DB.prodLog[ds][wid]={};if(!DB.prodLog[ds][wid][sid])DB.prodLog[ds][wid][sid]=[];
+  while(DB.prodLog[ds][wid][sid].length<=idx)DB.prodLog[ds][wid][sid].push({orderId:'',part:'',qty:''});
+  DB.prodLog[ds][wid][sid][idx][field]=val;
+}
+
+function addPR(btn){
+  const ds=btn.dataset.ds;const wid=btn.dataset.wid;const sid=btn.dataset.sid;
+  if(!DB.prodLog[ds])DB.prodLog[ds]={};if(!DB.prodLog[ds][wid])DB.prodLog[ds][wid]={};if(!DB.prodLog[ds][wid][sid])DB.prodLog[ds][wid][sid]=[];
+  const idx=DB.prodLog[ds][wid][sid].length;DB.prodLog[ds][wid][sid].push({orderId:'',part:'',qty:''});
+  const c=document.getElementById(`ent_${wid}_${sid}`);if(c){const dv=document.createElement('div');dv.innerHTML=prRow(wid,sid,idx,{orderId:'',part:'',qty:''});c.appendChild(dv.firstElementChild);}
+}
+
+function remEnt(el){
+  const ds=window._pD||today();const wid=el.dataset.wid;const sid=el.dataset.sid;const idx=parseInt(el.dataset.idx);
+  if(!DB.prodLog[ds]?.[wid]?.[sid])return;DB.prodLog[ds][wid][sid].splice(idx,1);
+  const c=document.getElementById(`ent_${wid}_${sid}`);
+  if(c)c.innerHTML=DB.prodLog[ds][wid][sid].length===0?prRow(wid,sid,0,{orderId:'',part:'',qty:''}):DB.prodLog[ds][wid][sid].map((e,i)=>prRow(wid,sid,i,e)).join('');
+}
+
+function setLeave(cb){
+  const ds=cb.dataset.ds;const wid=cb.dataset.wid;const sid=cb.dataset.sid;
+  if(!DB.leaveLog)DB.leaveLog={};if(!DB.leaveLog[ds])DB.leaveLog[ds]={};if(!DB.leaveLog[ds][wid])DB.leaveLog[ds][wid]={};
+  DB.leaveLog[ds][wid][sid]=cb.checked;saveSync();
+}
+
+function setFullDayLeave(cb){
+  const ds=cb.dataset.ds;const wid=cb.dataset.wid;
+  if(!DB.leaveLog)DB.leaveLog={};if(!DB.leaveLog[ds])DB.leaveLog[ds]={};if(!DB.leaveLog[ds][wid])DB.leaveLog[ds][wid]={};
+  DB.timeSlots.forEach(slot=>{DB.leaveLog[ds][wid][slot.id]=cb.checked;});
+  saveSync();showPage('production');
+}
+
+function savePL(){saveSync();toast('Production log saved!');}
+
+// ── MATERIALS ─────────────────────────────────────────────────
+function matPage(){
+  if(!DB.materials)DB.materials={};
+  const sO=window._mO||DB.orders[0]?.id;window._mO=sO;
+  const mats=DB.materials[sO]||[];
+  const tmc=mats.reduce((s,m)=>{const p=m.pricePerUnit||0;const u=(m.entries||[]).reduce((a,e)=>a+(e.used||0),0);const w=(m.entries||[]).reduce((a,e)=>a+(e.wastage||0),0);return s+(u+w)*p;},0);
+  return`<div class="ph"><div><div class="pt">Materials</div><div class="ps">Usage and cost per order</div></div><div class="ha"><button class="btn btn-pr" onclick="openAMM()">+ Add Material</button></div></div>
+  <div class="content">
+  <div class="fg mb12" style="max-width:320px"><label>Order</label><select onchange="window._mO=this.value;showPage('materials')">${DB.orders.map(o=>`<option value="${H(o.id)}" ${o.id===sO?'selected':''}>${H(o.id)} - ${H(o.name)}</option>`).join('')}</select></div>
+  ${canFin()&&tmc>0?`<div class="sbox">Total Material Cost (used + wastage): <strong>${fmt(tmc)}</strong></div>`:''}
+  ${!mats.length?'<p class="tm3">No materials added yet.</p>':mats.map(m=>{
+    const p=m.pricePerUnit||0;const u=(m.entries||[]).reduce((s,e)=>s+(e.used||0),0);const w=(m.entries||[]).reduce((s,e)=>s+(e.wastage||0),0);const stk=m.fromStock||0;const tot=m.ordered+stk;const bal=tot-u-w;const pct=tot?Math.round(u/tot*100):0;
+    return`<div class="card"><div class="ch"><div class="flex fca g8"><span class="fw6">${H(m.name)}</span><span class="badge bg-bl ts">${H(m.unit)}</span></div>
+    <div class="flex g8"><button class="btn btn-gh btn-sm" onclick="openUM('${H(sO)}','${H(m.id)}')">+ Usage</button>${isAdmin()?`<button class="btn btn-gh btn-sm" onclick="editM('${H(sO)}','${H(m.id)}')">Edit</button>`:''}</div></div>
+    <div class="cb"><div class="sg sg4">
+      <div><div class="sl">Purchased</div><div class="sv mono">${m.ordered} ${m.unit}</div></div>
+      <div><div class="sl">From Stock</div><div class="sv mono">${stk} ${m.unit}</div></div>
+      <div><div class="sl">Used</div><div class="sv mono tg">${u.toFixed(2)} ${m.unit}</div></div>
+      <div><div class="sl">Balance</div><div class="sv mono ${bal<0?'tr':''}">${bal.toFixed(2)} ${m.unit}</div></div>
+    </div>
+    ${canFin()&&p>0?`<div class="sg sg3 mt8">
+      <div><div class="sl">Price/Unit</div><div class="sv" style="font-size:14px">${fmt(p)}</div></div>
+      <div><div class="sl">Used Cost</div><div class="sv tg" style="font-size:14px">${fmt(u*p)}</div></div>
+      <div><div class="sl">Wastage Cost</div><div class="sv tr" style="font-size:14px">${fmt(w*p)}</div></div>
+    </div>`:''}
+    <div class="pb mt8"><div class="pf ${pct>90?'rd':pct>70?'':'gn'}" style="width:${Math.min(100,pct)}%"></div></div>
+    <div class="ts tm3 mt4">${pct}% used | Wastage: ${w.toFixed(2)} ${m.unit}</div>
+    ${(m.entries||[]).length?`<hr class="dv"><table><thead><tr><th>Date</th><th>Used</th><th>Wastage</th>${canFin()?'<th>Cost</th>':''}<th>Note</th></tr></thead><tbody>
+    ${[...(m.entries||[])].reverse().slice(0,6).map(e=>`<tr><td class="mono ts">${e.date}</td><td class="mono">${e.used} ${m.unit}</td><td class="mono tm3">${e.wastage||0} ${m.unit}</td>${canFin()?`<td class="mono ts">${fmt((e.used+(e.wastage||0))*p)}</td>`:''}<td class="ts tm3">${H(e.note||'')}</td></tr>`).join('')}
+    </tbody></table>`:''}
+    </div></div>`;}).join('')}
+  </div>`;
+}
+
+function openAMM(){
+  const inner=`<div class="mh"><div class="mt2">Add Material</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><div class="fgrid fc2">
+    <div class="fg" style="grid-column:1/-1"><label>Material Name</label><input id="mtnm" placeholder="e.g. Spun Fabric, Thread, Collar, Button"></div>
+    <div class="fg"><label>Unit</label><select id="mtun"><option>kg</option><option>grams</option><option>cones</option><option>count</option><option>metres</option><option>litres</option></select></div>
+    <div class="fg"><label>Price per Unit (Rs.)</label><input type="number" id="mtprice" step="0.01" placeholder="0"></div>
+    <div class="fg"><label>Purchased Qty</label><input type="number" id="mtoq" step="0.01" placeholder="0"></div>
+    <div class="fg"><label>From Existing Stock</label><input type="number" id="mtstock" step="0.01" placeholder="0"></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveAMM()">Add</button></div>`;
+  modal(mkModal(inner));
+}
+function saveAMM(){
+  const nm=document.getElementById('mtnm').value.trim();const un=document.getElementById('mtun').value;const p=parseFloat(document.getElementById('mtprice').value)||0;const oq=parseFloat(document.getElementById('mtoq').value)||0;const st=parseFloat(document.getElementById('mtstock').value)||0;
+  if(!nm){toast('Name required');return;}const sO=window._mO||DB.orders[0]?.id;if(!DB.materials[sO])DB.materials[sO]=[];
+  DB.materials[sO].push({id:'M'+Date.now(),name:nm,unit:un,pricePerUnit:p,ordered:oq,fromStock:st,entries:[]});
+  closeModal();saveSync();showPage('materials');toast('Added!');
+}
+function openUM(oid,mid){
+  const m=(DB.materials[oid]||[]).find(x=>x.id===mid);if(!m)return;
+  const u=(m.entries||[]).reduce((s,e)=>s+(e.used||0),0);const w=(m.entries||[]).reduce((s,e)=>s+(e.wastage||0),0);const bal=(m.ordered+(m.fromStock||0))-u-w;
+  const inner=`<div class="mh"><div class="mt2">Add Usage - ${H(m.name)}</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><div class="ibox ts">Balance: <strong>${bal.toFixed(2)} ${m.unit}</strong> | Price: <strong>${fmt(m.pricePerUnit||0)}/${m.unit}</strong></div>
+  <div class="fgrid fc2">
+    <div class="fg"><label>Date</label><input type="date" id="usdt" value="${today()}"></div>
+    <div class="fg"><label>Qty Used (${H(m.unit)})</label><input type="number" id="usqt" step="0.01"></div>
+    <div class="fg"><label>Wastage (${H(m.unit)})</label><input type="number" id="uswt" step="0.01" placeholder="0"></div>
+    <div class="fg"><label>Note</label><input id="usnote" placeholder="e.g. Morning cutting"></div>
+  </div></div>
+  <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveUM('${H(oid)}','${H(mid)}')">Save</button></div>`;
+  modal(mkModal(inner));
+}
+function saveUM(oid,mid){
+  const m=(DB.materials[oid]||[]).find(x=>x.id===mid);if(!m)return;
+  const dt=document.getElementById('usdt').value;const qt=parseFloat(document.getElementById('usqt').value)||0;const wt=parseFloat(document.getElementById('uswt').value)||0;const nt=document.getElementById('usnote').value;
+  if(!m.entries)m.entries=[];m.entries.push({date:dt,used:qt,wastage:wt,note:nt});
+  closeModal();saveSync();showPage('materials');toast('Saved!');
+}
+function editM(oid,mid){
+  const m=(DB.materials[oid]||[]).find(x=>x.id===mid);if(!m)return;
+  const inner=`<div class="mh"><div class="mt2">Edit Material</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><div class="fgrid fc2">
+    <div class="fg" style="grid-column:1/-1"><label>Name</label><input id="emnm" value="${H(m.name)}"></div>
+    <div class="fg"><label>Price/Unit (Rs.)</label><input type="number" id="emprice" step="0.01" value="${m.pricePerUnit||0}"></div>
+    <div class="fg"><label>Purchased Qty</label><input type="number" id="emoq" step="0.01" value="${m.ordered}"></div>
+    <div class="fg"><label>From Stock</label><input type="number" id="emstock" step="0.01" value="${m.fromStock||0}"></div>
+  </div></div>
+  <div class="mf">
+    <button class="btn btn-dn btn-sm" onclick="delMat('${H(oid)}','${H(mid)}')">Delete</button>
+    <button class="btn btn-gh" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-pr" onclick="saveME('${H(oid)}','${H(mid)}')">Save</button>
+  </div>`;
+  modal(mkModal(inner));
+}
+function saveME(oid,mid){const m=(DB.materials[oid]||[]).find(x=>x.id===mid);if(!m)return;m.name=document.getElementById('emnm').value;m.pricePerUnit=parseFloat(document.getElementById('emprice').value)||0;m.ordered=parseFloat(document.getElementById('emoq').value)||0;m.fromStock=parseFloat(document.getElementById('emstock').value)||0;closeModal();saveSync();showPage('materials');toast('Updated!');}
+function delMat(oid,mid){if(!confirm('Delete?'))return;DB.materials[oid]=(DB.materials[oid]||[]).filter(x=>x.id!==mid);closeModal();saveSync();showPage('materials');toast('Deleted');}
+
+// ── WORKERS ───────────────────────────────────────────────────
+function workers(){
+  return`<div class="ph"><div><div class="pt">Workers</div></div><div class="ha">${isAdmin()?`<button class="btn btn-pr" onclick="openAW()">+ Add Worker</button>`:''}</div></div>
+  <div class="content">
+  ${DB.departments.map(dept=>{const ws=DB.workers.filter(w=>w.dept===dept.id);if(!ws.length)return'';
+    return`<div class="card mb12"><div class="ch"><span class="ct">${H(dept.name)}</span><span class="badge bg-bl">${ws.length} workers</span></div>
+    <table><thead><tr><th>Name</th>${canFin()?'<th>Salary</th><th>Daily Rate</th>':''}<th></th></tr></thead><tbody>
+    ${ws.map(w=>`<tr><td class="fw6">${H(w.name)}</td>${canFin()?`<td class="mono">${fmt(w.salary)}</td><td class="mono tm3">${fmt(Math.round(w.salary/26))}</td>`:''}<td>${isAdmin()?`<button class="btn btn-gh btn-sm" onclick="openEW('${H(w.id)}')">Edit</button>`:''}</td></tr>`).join('')}
+    </tbody></table></div>`;}).join('')}
+  </div>`;
+}
+function openAW(){
+  const dOpts=DB.departments.map(d=>`<option value="${H(d.id)}">${H(d.name)}</option>`).join('');
+  const inner=`<div class="mh"><div class="mt2">Add Worker</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><div class="fgrid fc2">
+    <div class="fg"><label>Name</label><input id="nwnm"></div>
+    <div class="fg"><label>Department</label><select id="nwdp">${dOpts}</select></div>
+    ${canFin()?'<div class="fg"><label>Monthly Salary (Rs.)</label><input type="number" id="nwsal"></div>':''}
+  </div></div>
+  <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveAW()">Add</button></div>`;
+  modal(mkModal(inner));
+}
+function saveAW(){const nm=document.getElementById('nwnm').value.trim();const dp=document.getElementById('nwdp').value;const sal=parseInt(document.getElementById('nwsal')?.value)||0;if(!nm){toast('Name required');return;}DB.workers.push({id:'W'+String(Date.now()).slice(-6),name:nm,dept:dp,salary:sal});closeModal();saveSync();showPage('workers');toast('Added!');}
+function openEW(id){
+  const w=getWorker(id);const dOpts=DB.departments.map(d=>`<option value="${H(d.id)}" ${d.id===w.dept?'selected':''}>${H(d.name)}</option>`).join('');
+  const inner=`<div class="mh"><div class="mt2">Edit - ${H(w.name)}</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><div class="fgrid fc2">
+    <div class="fg" style="grid-column:1/-1"><label>Name</label><input id="ewnm" value="${H(w.name)}"></div>
+    <div class="fg"><label>Department</label><select id="ewdp">${dOpts}</select></div>
+    ${canFin()?`<div class="fg"><label>Monthly Salary (Rs.)</label><input type="number" id="ewsal" value="${w.salary}"></div>`:''}
+  </div></div>
+  <div class="mf"><button class="btn btn-dn btn-sm" onclick="delW('${H(id)}')">Remove</button><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveEW('${H(id)}')">Save</button></div>`;
+  modal(mkModal(inner));
+}
+function saveEW(id){const w=getWorker(id);w.name=document.getElementById('ewnm').value;w.dept=document.getElementById('ewdp').value;if(document.getElementById('ewsal'))w.salary=parseInt(document.getElementById('ewsal').value)||w.salary;closeModal();saveSync();showPage('workers');toast('Updated!');}
+function delW(id){if(!confirm('Remove?'))return;DB.workers=DB.workers.filter(w=>w.id!==id);closeModal();saveSync();showPage('workers');toast('Removed');}
+
+// ── INCENTIVES ────────────────────────────────────────────────
+function incentives(){
+  if(!canFin())return`<div class="ph"><div><div class="pt">Incentives</div></div></div><div class="content"><p class="tm3">Admin only.</p></div>`;
+  const sO=window._iO||DB.orders[0]?.id;window._iO=sO;const o=getOrder(sO);if(!o)return`<div class="ph"><div><div class="pt">Incentives</div></div></div><div class="content"><p class="tm3">No orders.</p></div>`;
+  const done=getTotalDone(sO)||0;const pool=o.incentivePerPiece*done;const inc=calcIncentives(sO);const csh=cxShares(sO);const ts=DB.departments.reduce((s,d)=>s+d.share,0);
+  return`<div class="ph"><div><div class="pt">Incentives</div></div><div class="ha"><button class="btn btn-gh btn-sm" onclick="openDS()">Edit Dept Shares</button></div></div>
+  <div class="content">
+  <div class="fg mb12" style="max-width:320px"><label>Order</label><select onchange="window._iO=this.value;showPage('incentives')">${DB.orders.map(o2=>`<option value="${H(o2.id)}" ${o2.id===sO?'selected':''}>${H(o2.id)} - ${H(o2.name)}</option>`).join('')}</select></div>
+  ${ts!==100?`<div class="wbox">Shares total ${ts}% - must be 100%</div>`:''}
+  <div class="sg sg3">
+    <div class="sc"><div class="sl">Incentive/Piece</div><div class="sv mono tc">${fmt(o.incentivePerPiece)}</div><button class="btn btn-gh btn-sm mt8" onclick="openEIR('${H(sO)}')">Edit Rate</button></div>
+    <div class="sc"><div class="sl">Pieces Confirmed</div><div class="sv mono">${fmtN(done)}</div></div>
+    <div class="sc"><div class="sl">Total Pool</div><div class="sv mono tg">${fmt(pool)}</div></div>
+  </div>
+  <div class="card"><div class="ch"><span class="ct">Worker Incentive Breakdown</span></div>
+  <table><thead><tr><th>Worker</th><th>Dept</th><th>Share Logic</th><th>Amount</th></tr></thead><tbody>
+  ${DB.workers.map(w=>{const d=getDept(w.dept);const si=w.dept==='stitching'?((csh[w.id]||0)*100).toFixed(1)+'% complexity':'Equal ('+DB.workers.filter(x=>x.dept===w.dept).length+')';return`<tr><td class="fw6">${H(w.name)}</td><td><span class="badge bg-pu ts">${H(d?d.name:w.dept)}</span></td><td class="ts tm3">${si}</td><td class="mono tg fw6">${fmt(inc[w.id]||0)}</td></tr>`;}).join('')}
+  </tbody></table></div></div>`;
+}
+function openDS(){
+  const rows=DB.departments.map(d=>`<div class="wr"><span class="fw6">${H(d.name)}</span><div class="flex fca g8"><input type="number" min="0" max="100" value="${d.share}" id="ds_${d.id}" style="width:65px;text-align:center" oninput="updDsT()"><span class="tm3">%</span><button class="btn btn-dn btn-sm" onclick="delDept('${H(d.id)}')">x</button></div></div>`).join('');
+  const inner=`<div class="mh"><div class="mt2">Edit Department Shares</div><button class="xbtn" onclick="closeModal()">&#215;</button></div>
+  <div class="mb2"><p class="ts tm3 mb8">Must total 100%.</p>${rows}<div id="dstot" class="mt8 mono ts"></div><hr class="dv">
+  <div class="stitle">Add Department</div>
+  <div class="flex g8 fca"><input id="newDN" placeholder="Dept name" style="flex:1"><input type="number" id="newDS" placeholder="%" style="width:65px"><button class="btn btn-bl btn-sm" onclick="addDept()">Add</button></div></div>
+  <div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveDS()">Save</button></div>`;
+  modal(mkModal(inner,true));updDsT();
+}
+function updDsT(){let s=0;DB.departments.forEach(d=>{const el=document.getElementById('ds_'+d.id);if(el)s+=parseInt(el.value)||0;});const el=document.getElementById('dstot');if(el)el.innerHTML=`Total: <span style="color:${s===100?'var(--gn)':'var(--ac3)'}">${s}%</span> ${s===100?'OK':'must be 100%'}`;}
+function addDept(){const nm=document.getElementById('newDN').value.trim();const sh=parseInt(document.getElementById('newDS').value)||0;if(!nm)return;DB.departments.push({id:nm.toLowerCase().replace(/\s+/g,'_'),name:nm,share:sh});closeModal();openDS();}
+function delDept(id){if(!confirm('Remove?'))return;DB.departments=DB.departments.filter(d=>d.id!==id);closeModal();openDS();}
+function saveDS(){let s=0;DB.departments.forEach(d=>{const el=document.getElementById('ds_'+d.id);if(el){d.share=parseInt(el.value)||0;s+=d.share;}});if(s!==100){toast('Total is '+s+'% - must be 100%',true);return;}closeModal();saveSync();showPage('incentives');toast('Saved!');}
+function openEIR(oid){const o=getOrder(oid);const inner=`<div class="mh"><div class="mt2">Edit Incentive Rate</div><button class="xbtn" onclick="closeModal()">&#215;</button></div><div class="mb2"><div class="fg"><label>Incentive per Piece (Rs.)</label><input type="number" id="eir" step="0.5" value="${o.incentivePerPiece}"></div></div><div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveEIR('${H(oid)}')">Save</button></div>`;modal(mkModal(inner));}
+function saveEIR(oid){const o=getOrder(oid);o.incentivePerPiece=parseFloat(document.getElementById('eir').value)||0;closeModal();saveSync();showPage('incentives');toast('Updated!');}
+
+// ── COST SUMMARY ──────────────────────────────────────────────
+function costing(){
+  if(!canFin())return`<div class="ph"><div><div class="pt">Cost Summary</div></div></div><div class="content"><p class="tm3">Admin only.</p></div>`;
+  return`<div class="ph"><div><div class="pt">Cost Summary</div><div class="ps">Labour + Material + Incentive per order</div></div></div>
+  <div class="content">
+  ${DB.orders.map(o=>{
+    const dr=w=>w.salary/26;const done=getTotalDone(o.id);
+    const daysW=new Set(Object.keys(DB.dailyOutput||{}).filter(d=>(DB.dailyOutput[d]?.[o.id]?.supervisorActual||0)>0)).size;
+    const tSal=DB.workers.reduce((s,w)=>s+w.salary,0);const dCost=DB.workers.reduce((s,w)=>s+dr(w),0);const tLab=dCost*daysW;
+    const incP=o.incentivePerPiece*done;const mC=matCost(o.id);const total=tLab+incP+mC;const cpp=done?total/done:0;
+    return`<div class="card mb12"><div class="ch"><div class="flex fca g12"><span class="badge bg-or">${H(o.id)}</span><span class="fw7">${H(o.name)}</span></div></div>
+    <div class="cb"><div class="sg sg4">
+      <div><div class="sl">Days in Production</div><div class="sv">${daysW}</div></div>
+      <div><div class="sl">Pieces Confirmed</div><div class="sv mono tg">${fmtN(done)}</div></div>
+      <div><div class="sl">Total Labour</div><div class="sv mono tc">${fmt(Math.round(tLab))}</div></div>
+      <div><div class="sl">Material Cost</div><div class="sv mono tb">${fmt(Math.round(mC))}</div></div>
+    </div><div class="sg sg3 mt8">
+      <div><div class="sl">Incentive Pool</div><div class="sv mono" style="font-size:16px">${fmt(incP)}</div></div>
+      <div><div class="sl">Total Cost</div><div class="sv mono tc" style="font-size:16px">${fmt(Math.round(total))}</div></div>
+      <div><div class="sl">Cost per Piece</div><div class="sv mono tg" style="font-size:16px">${done?fmt(cpp.toFixed(2)):'--'}</div></div>
+    </div><hr class="dv">
+    <table><thead><tr><th>Worker</th><th>Dept</th><th>Monthly</th><th>Daily</th><th>Order Cost (${daysW}d)</th></tr></thead><tbody>
+    ${DB.workers.map(w=>`<tr><td>${H(w.name)}</td><td><span class="badge bg-pu ts">${H(w.dept)}</span></td><td class="mono">${fmt(w.salary)}</td><td class="mono tm3">${fmt(Math.round(dr(w)))}</td><td class="mono">${fmt(Math.round(dr(w)*daysW))}</td></tr>`).join('')}
+    <tr style="border-top:2px solid var(--bd)"><td colspan="2" class="fw7">TOTAL</td><td class="mono fw7">${fmt(tSal)}</td><td class="mono fw7">${fmt(Math.round(dCost))}</td><td class="mono tc fw7">${fmt(Math.round(tLab))}</td></tr>
+    </tbody></table></div></div>`;}).join('')}
+  </div>`;
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────
+function analytics(){
+  const ds=window._aD||today();window._aD=ds;
+  const allD=[...new Set(Object.keys(DB.prodLog||{}))].sort();
+  const dTot={};allD.forEach(d=>{dTot[d]=DB.orders.reduce((s,o)=>s+getActual(o.id,d),0);});
+  const slTot={};DB.timeSlots.forEach(sl=>{let t=0,c=0;Object.values(DB.prodLog||{}).forEach(dl=>DB.workers.filter(w=>HOURLY_DEPTS.includes(w.dept)).forEach(w=>((dl[w.id]||{})[sl.id]||[]).forEach(e=>{if(e.qty){t+=parseInt(e.qty)||0;c++;}})));slTot[sl.id]={avg:c?Math.round(t/c):0,type:sl.type,start:sl.start};});
+  const maxSl=Math.max(...Object.values(slTot).map(s=>s.avg),1);const maxD=Math.max(...Object.values(dTot),1);
+  const wStats=DB.workers.filter(w=>w.dept==='stitching').map(w=>{let tq=0,ts2=0,dw=0;allD.forEach(d=>{const sc=dayScore(w.id,d);const p=dayParts(w.id,d);const q=Object.values(p).reduce((a,b)=>a+b,0);if(q){tq+=q;ts2+=sc;dw++;}});return{...w,tq,ts2,dw,avg:dw?ts2/dw:0};}).sort((a,b)=>b.ts2-a.ts2);
+  const ss=Object.entries(slTot).sort((a,b)=>b[1].avg-a[1].avg);const bsl=ss[0];const wsl=ss[ss.length-1];const bp=bestPerformer(ds);
+  const notes=DB.orders.map(o=>{const n=DB.dailyOutput?.[ds]?.[o.id]?.notes;return n?`<div class="wr"><span class="tc ts">${H(o.id)}</span><span class="ts tm2">${H(n)}</span></div>`:''}).filter(Boolean).join('');
+  return`<div class="ph"><div><div class="pt">Analytics</div></div><div class="ha"><input type="date" value="${ds}" style="width:150px" onchange="window._aD=this.value;showPage('analytics')"></div></div>
+  <div class="content">
+  <div class="sg sg4">
+    <div class="sc"><div class="sl">Best Hour (Avg)</div><div class="sv">${bsl?bsl[1].start:'--'}</div><div class="ss">${bsl?bsl[1].avg+' pcs avg':''}</div></div>
+    <div class="sc"><div class="sl">Least Productive Hour</div><div class="sv tr">${wsl?wsl[1].start:'--'}</div><div class="ss">${wsl?wsl[1].avg+' pcs avg':''}</div></div>
+    <div class="sc"><div class="sl">Days Tracked</div><div class="sv">${allD.length}</div></div>
+    <div class="sc"><div class="sl">Avg Daily Output</div><div class="sv mono">${allD.length?Math.round(Object.values(dTot).reduce((a,b)=>a+b,0)/allD.length):0}</div></div>
+  </div>
+  <div class="card"><div class="ch"><span class="ct">Best Performer - ${ds}</span></div><div class="cb">
+  ${bp?`<div class="flex fca g16"><div style="font-size:36px">&#127942;</div><div><div style="font-size:18px;font-weight:700">${H(bp.worker.name)}</div><div class="ts tm2 mt4">Score: <span class="tg fw6">${bp.score.toFixed(3)}</span></div></div></div><hr class="dv">
+  <table><thead><tr><th>Rank</th><th>Worker</th><th>Qty</th><th>Score</th></tr></thead><tbody>
+  ${[...DB.workers.filter(w=>w.dept==='stitching')].map(w=>{const p=dayParts(w.id,ds);const q=Object.values(p).reduce((a,b)=>a+b,0);const sc=dayScore(w.id,ds);return{w,q,sc};}).sort((a,b)=>b.sc-a.sc).map(({w,q,sc},i)=>`<tr style="${i===0?'background:rgba(39,174,96,.07)':''}"><td class="mono fw6 ${i===0?'tg':i===1?'tc':''}">#${i+1}${i===0?' G':i===1?' S':i===2?' B':''}</td><td class="fw6">${H(w.name)}</td><td class="mono">${q||'--'}</td><td class="mono ${i===0?'tg':''}">${sc.toFixed(3)}</td></tr>`).join('')}
+  </tbody></table>`:'<p class="tm3">No data for this date.</p>'}
+  </div></div>
+  <div class="sg sg2">
+    <div class="card"><div class="ch"><span class="ct">Daily Output (14 days)</span></div><div class="cb">
+    ${allD.length?`<div style="display:flex;gap:5px;align-items:flex-end;height:90px;">${allD.slice(-14).map(d=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;"><div style="font-size:8px;color:var(--tx2)">${dTot[d]||0}</div><div style="width:100%;background:${d===ds?'var(--ac)':'var(--bl)'};border-radius:2px 2px 0 0;height:${Math.round(((dTot[d]||0)/maxD)*70)}px;opacity:.85"></div><div style="font-size:8px;color:var(--tx3)">${d.slice(5)}</div></div>`).join('')}</div>`:'<p class="tm3 ts">No data yet</p>'}
+    </div></div>
+    <div class="card"><div class="ch"><span class="ct">Slot Efficiency</span></div><div class="cb">
+    <div style="display:flex;gap:4px;align-items:flex-end;height:90px;">${DB.timeSlots.map(sl=>{const s=slTot[sl.id]||{avg:0};return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;"><div style="font-size:8px;color:var(--tx2)">${s.avg}</div><div style="width:100%;background:${sl.type==='overtime'?'var(--ac)':'var(--ac2)'};border-radius:2px 2px 0 0;height:${Math.round((s.avg/maxSl)*70)}px;opacity:.85"></div><div style="font-size:8px;color:var(--tx3)">${sl.start}</div></div>`;}).join('')}</div>
+    </div></div>
+  </div>
+  ${notes?`<div class="card"><div class="ch"><span class="ct">Notes - ${ds}</span></div><div class="cb">${notes}</div></div>`:''}
+  <div class="card"><div class="ch"><span class="ct">All-Time Leaderboard</span></div>
+  <table><thead><tr><th>Rank</th><th>Worker</th><th>Total Qty</th><th>Days</th><th>Avg Score</th><th>Total Score</th></tr></thead><tbody>
+  ${wStats.map((w,i)=>`<tr><td class="mono fw6 ${i===0?'tg':i===1?'tc':''}">#${i+1}</td><td class="fw6">${H(w.name)}</td><td class="mono">${fmtN(w.tq)}</td><td class="mono">${w.dw}</td><td class="mono ${i===0?'tg':''}">${w.avg.toFixed(3)}</td><td class="mono">${w.ts2.toFixed(2)}</td></tr>`).join('')}
+  </tbody></table></div></div>`;
+}
+
+// ── REPORTS ───────────────────────────────────────────────────
+function reports(){
+  if(!canFin())return`<div class="ph"><div><div class="pt">Reports</div></div></div><div class="content"><p class="tm3">Admin only.</p></div>`;
+  const allD=[...new Set(Object.keys(DB.prodLog||{}))].sort();
+  const months=[...new Set(allD.map(d=>d.slice(0,7)))];
+  const selM=window._repM||months[months.length-1]||today().slice(0,7);window._repM=selM;
+  const daysInM=allD.filter(d=>d.startsWith(selM));
+
+  // Monthly production summary
+  let monthTotal=0;const orderTotals={};
+  daysInM.forEach(d=>{DB.orders.forEach(o=>{const ac=getActual(o.id,d);monthTotal+=ac;orderTotals[o.id]=(orderTotals[o.id]||0)+ac;});});
+
+  // Worker leave summary for month
+  const leaveSum={};DB.workers.forEach(w=>{let slots=0,fullDays=0,halfDays=0;
+    daysInM.forEach(d=>{const lc=Object.values(DB.leaveLog?.[d]?.[w.id]||{}).filter(Boolean).length;const wsl=DB.timeSlots.filter(s=>s.type==='work').length;if(lc>=wsl)fullDays++;else if(lc>=3)halfDays++;else slots+=lc;});
+    leaveSum[w.id]={slots,fullDays,halfDays};
+  });
+
+  // Salary calculation
+  const salaryCalc=DB.workers.map(w=>{
+    const ls=leaveSum[w.id]||{};const dr=w.salary/26;
+    const fullDayDed=ls.fullDays*dr;const halfDayDed=ls.halfDays*(dr/2);
+    const hrlyDed=ls.slots*(dr/8);const totalDed=fullDayDed+halfDayDed+hrlyDed;
+    const net=Math.max(0,w.salary-totalDed);
+    // OT hours
+    let otHrs=0;
+    daysInM.forEach(d=>{DB.timeSlots.filter(s=>s.type==='overtime').forEach(sl=>{const ents=(DB.prodLog[d]||{})[w.id]?.[sl.id]||[];if(ents.some(e=>e.qty>0))otHrs+=slotHrs(sl);});});
+    const otPay=otHrs*(DB.settings.otRate||60);
+    return{...w,fullDays:ls.fullDays,halfDays:ls.halfDays,hrSlots:ls.slots,totalDed,net,otHrs,otPay,take:net+otPay};
+  });
+
+  return`<div class="ph"><div><div class="pt">Reports</div><div class="ps">Monthly production and salary summary</div></div></div>
+  <div class="content">
+  <div class="fg mb12" style="max-width:200px"><label>Month</label><select onchange="window._repM=this.value;showPage('reports')">${months.map(m=>`<option value="${m}" ${m===selM?'selected':''}>${m}</option>`).join('')}</select></div>
+
+  <div class="card"><div class="ch"><span class="ct">Production Summary - ${selM}</span></div><div class="cb">
+    <div class="sg sg3">
+      <div><div class="sl">Total Output</div><div class="sv mono tg">${fmtN(monthTotal)}</div></div>
+      <div><div class="sl">Working Days</div><div class="sv">${daysInM.length}</div></div>
+      <div><div class="sl">Avg per Day</div><div class="sv mono">${daysInM.length?Math.round(monthTotal/daysInM.length):0}</div></div>
+    </div>
+    <table><thead><tr><th>Order</th><th>Pieces This Month</th><th>Total Done</th><th>Remaining</th></tr></thead><tbody>
+    ${DB.orders.map(o=>`<tr><td class="fw6">${H(o.id)} - ${H(o.name)}</td><td class="mono tg">${fmtN(orderTotals[o.id]||0)}</td><td class="mono">${fmtN(getTotalDone(o.id))}</td><td class="mono">${fmtN(getRemaining(o.id))}</td></tr>`).join('')}
+    </tbody></table>
+  </div></div>
+
+  <div class="card"><div class="ch"><span class="ct">Salary Sheet - ${selM}</span><button class="btn btn-gh btn-sm" onclick="printSalary()">&#128438; Print</button></div>
+  <div id="salaryTable"><table><thead><tr><th>Worker</th><th>Dept</th><th>Gross</th><th>Full Day Leave</th><th>Half Day</th><th>Hrly Leave Slots</th><th>Deductions</th><th>OT Hrs</th><th>OT Pay</th><th>Net Pay</th></tr></thead><tbody>
+  ${salaryCalc.map(w=>`<tr>
+    <td class="fw6">${H(w.name)}</td>
+    <td><span class="badge bg-pu ts">${H(w.dept)}</span></td>
+    <td class="mono">${fmt(w.salary)}</td>
+    <td class="mono ${w.fullDays>0?'tr':''}">${w.fullDays}</td>
+    <td class="mono ${w.halfDays>0?'tr':''}">${w.halfDays}</td>
+    <td class="mono ${w.hrSlots>0?'tr':''}">${w.hrSlots}</td>
+    <td class="mono tr">${fmt(Math.round(w.totalDed))}</td>
+    <td class="mono tb">${w.otHrs.toFixed(1)}</td>
+    <td class="mono tg">${fmt(Math.round(w.otPay))}</td>
+    <td class="mono tg fw6">${fmt(Math.round(w.take))}</td>
+  </tr>`).join('')}
+  <tr style="border-top:2px solid var(--bd)"><td colspan="2" class="fw7">TOTAL</td>
+    <td class="mono fw7">${fmt(salaryCalc.reduce((s,w)=>s+w.salary,0))}</td>
+    <td colspan="5"></td>
+    <td class="mono tg fw7">${fmt(Math.round(salaryCalc.reduce((s,w)=>s+w.otPay,0)))}</td>
+    <td class="mono tg fw7">${fmt(Math.round(salaryCalc.reduce((s,w)=>s+w.take,0)))}</td>
+  </tr></tbody></table></div>
+  </div>
+
+  <div class="card"><div class="ch"><span class="ct">Leave Record - ${selM}</span></div>
+  <table><thead><tr><th>Worker</th><th>Full Day Leave</th><th>Half Day</th><th>Hourly Leave Slots</th><th>Total Hours Lost</th></tr></thead><tbody>
+  ${DB.workers.map(w=>{const ls=leaveSum[w.id]||{};const hrLost=ls.slots*(DB.timeSlots.filter(s=>s.type==='work').reduce((s,sl)=>s+slotHrs(sl),0)/DB.timeSlots.filter(s=>s.type==='work').length);return`<tr><td class="fw6">${H(w.name)}</td><td class="mono ${ls.fullDays>0?'tr':''}">${ls.fullDays}</td><td class="mono ${ls.halfDays>0?'tr':''}">${ls.halfDays}</td><td class="mono ${ls.slots>0?'tr':''}">${ls.slots}</td><td class="mono">${hrLost.toFixed(1)}</td></tr>`;}).join('')}
+  </tbody></table></div>
+  </div>`;
+}
+
+function printSalary(){
+  const t=document.getElementById('salaryTable');if(!t)return;
+  const w=window.open('','_blank');
+  w.document.write('<html><head><title>Salary Sheet</title><style>body{font-family:sans-serif;font-size:12px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px;text-align:left;}th{background:#f5f5f5;}@media print{button{display:none}}</style></head><body>');
+  w.document.write('<h2>Salary Sheet - '+window._repM+'</h2>');
+  w.document.write(t.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();w.print();
+}
+
+// ── PARTS LIBRARY ─────────────────────────────────────────────
+function partsPage(){
+  return`<div class="ph"><div><div class="pt">Parts Library</div></div><div class="ha"><button class="btn btn-pr" onclick="openAP()">+ Add Part</button></div></div>
+  <div class="content"><div class="card"><div class="ch"><span class="ct">All Parts (${DB.parts.length})</span></div><div class="cb">
+  <div class="tl">${DB.parts.map((p,i)=>`<span class="tag">${H(p)}${isAdmin()?`<span class="tag-x" onclick="rmPart(${i})">&#215;</span>`:''}</span>`).join('')}</div>
+  </div></div></div>`;
+}
+function rmPart(i){DB.parts.splice(i,1);saveSync();showPage('parts');toast('Removed');}
+function openAP(){
+  const inner=`<div class="mh"><div class="mt2">Add Part</div><button class="xbtn" onclick="closeModal()">&#215;</button></div><div class="mb2"><div class="fg"><label>Part Name</label><input id="newpt" placeholder="e.g. Collar Attach"></div></div><div class="mf"><button class="btn btn-gh" onclick="closeModal()">Cancel</button><button class="btn btn-pr" onclick="saveAP()">Add</button></div>`;
+  modal(mkModal(inner));
+}
+function saveAP(){const v=document.getElementById('newpt').value.trim();if(!v){toast('Enter a name');return;}if(DB.parts.includes(v)){toast('Already exists');return;}DB.parts.push(v);closeModal();saveSync();showPage('parts');toast('Added!');}
+
+// ── TIME SLOTS ────────────────────────────────────────────────
+function tsPage(){
+  return`<div class="ph"><div><div class="pt">Time Slots</div></div><div class="ha"><button class="btn btn-pr btn-sm" onclick="rstSlots()">Reset Default</button></div></div>
+  <div class="content"><div class="ibox">10 slots - last 2 are overtime. Lunch gap (1:00-1:30) is the natural gap between slots 4 and 5.</div>
+  <div class="card"><div class="ch"><span class="ct">Time Slots</span></div><div class="cb">
+  <div style="display:grid;grid-template-columns:40px 1fr 1fr 1fr 90px;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--bd)">
+    <span class="ts tm3">#</span><span class="ts tm3">Label</span><span class="ts tm3">Start</span><span class="ts tm3">End</span><span class="ts tm3">Type</span>
+  </div>
+  ${DB.timeSlots.map((sl,i)=>`<div style="display:grid;grid-template-columns:40px 1fr 1fr 1fr 90px;gap:8px;align-items:center;margin-bottom:7px;">
+    <span class="mono ts tm3">${i+1}</span>
+    <input value="${H(sl.label)}" style="font-size:12px;padding:5px 8px" oninput="DB.timeSlots[${i}].label=this.value">
+    <input type="time" value="${sl.start}" style="font-size:12px;padding:5px 8px" oninput="DB.timeSlots[${i}].start=this.value">
+    <input type="time" value="${sl.end}" style="font-size:12px;padding:5px 8px" oninput="DB.timeSlots[${i}].end=this.value">
+    <select style="font-size:12px;padding:5px 6px" onchange="DB.timeSlots[${i}].type=this.value"><option value="work" ${sl.type==='work'?'selected':''}>Work</option><option value="overtime" ${sl.type==='overtime'?'selected':''}>Overtime</option></select>
+  </div>`).join('')}
+  <button class="btn btn-pr btn-sm mt12" onclick="saveSync();toast('Slots saved!');showPage('timeslots')">Save Slots</button>
+  </div></div></div>`;
+}
+function rstSlots(){if(!confirm('Reset?'))return;DB.timeSlots=JSON.parse(JSON.stringify(DEFAULT_SLOTS));saveSync();showPage('timeslots');toast('Reset done');}
+
+// ── SETTINGS ─────────────────────────────────────────────────
+function settings(){
+  return`<div class="ph"><div><div class="pt">Settings</div></div></div>
+  <div class="content">
+  <div class="card"><div class="ch"><span class="ct">Google Sheets Sync</span><span class="badge ${DB.settings.scriptUrl?'bg-gn':'bg-rd'}">${DB.settings.scriptUrl?'Connected':'Not Connected'}</span></div><div class="cb">
+    <div class="fg"><label>Apps Script Web App URL</label><input id="surl" value="${H(DB.settings.scriptUrl||'')}" placeholder="https://script.google.com/macros/s/.../exec" style="font-family:monospace;font-size:11px"></div>
+    <div class="flex g8 mt8">
+      <button class="btn btn-pr btn-sm" onclick="saveSU()">Save &amp; Connect</button>
+      <button class="btn btn-gh btn-sm" onclick="manualSync()">Sync Now</button>
+      ${DB.settings.scriptUrl?`<button class="btn btn-gh btn-sm" onclick="pushCloud().then(()=>toast('Pushed!'))">Push All</button>`:''}
+    </div>
+    <div id="surlSt" class="ts mt8 tm3"></div>
+  </div></div>
+  <div class="card"><div class="ch"><span class="ct">OT Rate</span></div><div class="cb">
+    <div class="fgrid fc2"><div class="fg"><label>Overtime Rate per Hour (Rs.)</label><input type="number" id="otrate" value="${DB.settings.otRate||60}"></div></div>
+    <button class="btn btn-pr btn-sm mt8" onclick="DB.settings.otRate=parseInt(document.getElementById('otrate').value)||60;saveSync();toast('OT rate updated!')">Save OT Rate</button>
+  </div></div>
+  ${isAdmin()?`<div class="card"><div class="ch"><span class="ct">Danger Zone</span></div><div class="cb"><div class="flex g8">
+    <button class="btn btn-dn btn-sm" onclick="if(confirm('Clear all local data?')){localStorage.removeItem('stv5');location.reload();}">Reset Local Data</button>
+    <button class="btn btn-gh btn-sm" onclick="location.reload()">Switch Role</button>
+  </div></div></div>`:''}
+  </div>`;
+}
+
+
+// ── MOBILE HELPERS ──────────────────────────────────────────
+function toggleDrawer(){
+  document.getElementById('mobileDrawer').classList.toggle('open');
+  document.getElementById('drawerOverlay').classList.toggle('open');
+}
+function closeDrawer(){
+  document.getElementById('mobileDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+function setMobileNav(page){
+  const keys=['dashboard','orders','production','supervisor'];
+  document.querySelectorAll('.mn-item').forEach(el=>{
+    el.classList.remove('active');
+    const id=el.id?.replace('mn_','');
+    if(id===page||(id==='more'&&!keys.includes(page)))el.classList.add('active');
+  });
+}
+
+// ── KEYBOARD SHORTCUTS ──────────────────────────────────────
+function setupKeyboardShortcuts(){
+  document.addEventListener('keydown',e=>{
+    // Don't fire when typing in input/textarea/select
+    if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+    if(e.ctrlKey||e.metaKey){
+      if(e.key==='k'){e.preventDefault();showKbShortcuts();return;}
+      if(e.key==='s'){e.preventDefault();savePL();return;}
+    }
+    if(e.key==='Escape'){closeModal();closeDrawer();const sp=document.querySelector('.shortcuts-panel');if(sp)sp.remove();return;}
+    if(e.key==='d'||e.key==='D'){showPage('dashboard');}
+    else if(e.key==='o'||e.key==='O'){showPage('orders');}
+    else if(e.key==='p'||e.key==='P'){showPage('production');}
+    else if(e.key==='s'||e.key==='S'){if(isSup())showPage('supervisor');}
+    else if(e.key==='w'||e.key==='W'){showPage('workers');}
+    else if(e.key==='r'||e.key==='R'){if(canFin())showPage('reports');}
+    else if(e.key==='a'||e.key==='A'){showPage('analytics');}
+    else if(e.key==='c'||e.key==='C'){showPage('calendar');}
+    else if(e.key==='m'||e.key==='M'){showPage('materials');}
+    else if(e.key==='+'||e.key==='n'||e.key==='N'){if(isAdmin()&&currentPage==='orders')openNOM();}
+    else if(e.key==='?'){showKbShortcuts();}
+  });
+}
+
+function showKbShortcuts(){
+  const existing=document.querySelector('.shortcuts-panel');if(existing){existing.remove();return;}
+  const shortcuts=[
+    {key:'D',desc:'Dashboard'},
+    {key:'O',desc:'Orders'},
+    {key:'P',desc:'Production Log'},
+    {key:'S',desc:'Daily Output (Supervisor)'},
+    {key:'W',desc:'Workers'},
+    {key:'A',desc:'Analytics'},
+    {key:'C',desc:'Calendar'},
+    {key:'M',desc:'Materials'},
+    {key:'R',desc:'Reports (Admin)'},
+    {key:'N / +',desc:'New Order (on Orders page)'},
+    {key:'Ctrl+S',desc:'Save Production Log'},
+    {key:'Ctrl+K / ?',desc:'Show this panel'},
+    {key:'Esc',desc:'Close modal / this panel'},
+  ];
+  const panel=document.createElement('div');
+  panel.className='shortcuts-panel';
+  panel.onclick=e=>{if(e.target===panel)panel.remove();};
+  panel.innerHTML=`<div class="shortcuts-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-weight:700;font-size:15px">&#9000; Keyboard Shortcuts</div>
+      <button onclick="this.closest('.shortcuts-panel').remove()" style="background:none;border:none;color:var(--tx2);cursor:pointer;font-size:20px">&#215;</button>
+    </div>
+    ${shortcuts.map(s=>`<div class="sc-row"><span class="tm2 ts">${s.desc}</span><span><span class="kbd">${s.key}</span></span></div>`).join('')}
+    <div class="ts tm3 mt8">Press <span class="kbd">Esc</span> or click outside to close</div>
+  </div>`;
+  document.body.appendChild(panel);
+}
+
+function saveSU(){
+  const url=document.getElementById('surl').value.trim();const st=document.getElementById('surlSt');
+  if(!url){DB.settings.scriptUrl='';saveLocal();setSS('er','Not connected');toast('Cleared');return;}
+  if(!url.startsWith('https://script.google.com')){st.style.color='var(--ac3)';st.textContent='URL must start with https://script.google.com';return;}
+  DB.settings.scriptUrl=url;saveLocal();setSS('sy','Connecting...');st.textContent='Testing...';
+  apiCall('ping').then(r=>{
+    if(r&&r.ok){setSS('ok','Connected');st.style.color='var(--gn)';st.textContent='Connected! Uploading data...';toast('Connected!');pushCloud().then(()=>{st.textContent='Connected and data saved to Google Sheets!';});}
+    else{setSS('ok','URL saved');st.style.color='var(--yw)';st.textContent='URL saved. Open from Netlify for sync to work. Data safe locally.';}
+  });
+}
+</script>
+</body>
+</html>
