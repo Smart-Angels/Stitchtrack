@@ -389,7 +389,11 @@ let DB = {
   leaveLog:{},
   dailyOutput:{},
   materials:{},
+  workerSlotOrders:{}, // {wid: {sid: orderId}} — per-worker per-slot default order
 };
+
+// Workers hidden in production log (not persisted, resets on reload)
+let hiddenWorkers = new Set();
 
 // ── STORAGE ──────────────────────────────────────────────────
 function saveLocal(){try{localStorage.setItem('stv5',JSON.stringify(DB));}catch(e){}}
@@ -471,6 +475,7 @@ async function manualSync(){
     if(r.dailyOutput&&Object.keys(r.dailyOutput).length)DB.dailyOutput=r.dailyOutput;
     if(r.materials&&Object.keys(r.materials).length)DB.materials=r.materials;
     if((r.timeSlots||[]).length)DB.timeSlots=r.timeSlots;
+    if(r.workerSlotOrders&&Object.keys(r.workerSlotOrders).length)DB.workerSlotOrders=r.workerSlotOrders;
     if(r.settings){if(r.settings.capacity)DB.settings.capacity=r.settings.capacity;if(r.settings.otRate)DB.settings.otRate=r.settings.otRate;}
     saveLocal();setSS('ok','Synced');showPage(currentPage);toast('Synced!');
   }else if(r&&!r.savedAt){
@@ -1135,7 +1140,7 @@ function production(){
       </div>`;
     }
 
-    return`<div class="wblock">
+    return`<div class="wblock" id="wb_${w.id}" ${hiddenWorkers.has(w.id)?'style="display:none"':''}>
       <div class="wbh">
         <div class="flex fca g8">
           <span class="fw6">${H(w.name)}</span>
@@ -1143,6 +1148,7 @@ function production(){
           ${isFD?'<span class="badge bg-rd">Full Day Leave</span>':isHD?'<span class="badge bg-yw">Half Day</span>':lc>0?`<span class="badge bg-or">${lc} slots leave</span>`:''}
         </div>
         <div class="flex fca g8">
+          <button onclick="toggleWorkerVis('${w.id}')" title="Hide this worker" style="background:none;border:1px solid var(--bd);border-radius:4px;color:var(--tx3);cursor:pointer;padding:3px 7px;font-size:11px;line-height:1">&#128065; Hide</button>
           <span class="ts tm3">Full Day Off:</span>
           <label class="tog" title="Mark full day leave"><input type="checkbox" ${isFD?'checked':''} data-wid="${w.id}" data-ds="${ds}" onchange="setFullDayLeave(this)"><span class="tog-sl"></span></label>
           ${tq>0?`<span class="ts mono tm2">${tq}pc</span>`:''}
@@ -1157,6 +1163,8 @@ function production(){
     <div><div class="pt">Production Log</div><div class="ps">Parts per slot | Toggle leave per slot or full day</div></div>
     <div class="ha">
       <input type="date" value="${ds}" style="width:150px" onchange="window._pD=this.value;showPage('production')">
+      <button class="btn btn-gh btn-sm" id="autoHideBtn" onclick="autoHideOnLeave('${ds}')" title="Hide all workers on full-day leave">&#128065; Hide On-Leave</button>
+      <button class="btn btn-gh btn-sm" onclick="showAllWorkers()" title="Show all hidden workers">&#128064; Show All</button>
       <button class="btn btn-pr btn-sm" onclick="savePL()">&#128190; Save</button>
     </div>
   </div>
@@ -1170,7 +1178,7 @@ function production(){
     <span class="ts tm3" style="white-space:nowrap;font-size:10px">Pre-fills order in new rows</span>
   </div>
   <div class="content">
-  <div class="ibox ts mb12">Toggle <strong>L</strong> for slot leave. Use <strong>Full Day Off</strong> switch to mark entire day at once. 3+ slots = Half Day badge shown.</div>
+  <div class="ibox ts mb12">Toggle <strong>L</strong> for slot leave. Use <strong>Full Day Off</strong> switch to mark entire day at once. 3+ slots = Half Day badge. Click <strong>&#9733;</strong> next to an order to set it as the default for that worker+slot.</div>
   <div class="stitle">Stitching, Cutting, Printing &amp; Helpers - Hourly</div>
   ${hwks.map(w=>buildWorkerBlock(w,true)).join('')}
   <hr class="dv">
@@ -1181,17 +1189,20 @@ function production(){
 
 function prRow(wid,sid,idx,entry){
   const uid=`${wid}_${sid}_${idx}`;
-  // Pre-fill order from context if no order set yet
-  const ctxOrd=(entry.orderId||'')||window._pOrd||'';
+  // Order priority: saved entry > worker-slot default > global context order
+  const workerSlotDefault=(DB.workerSlotOrders[wid]||{})[sid]||'';
+  const ctxOrd=(entry.orderId||'')||workerSlotDefault||window._pOrd||'';
   if(ctxOrd&&!entry.orderId){entry.orderId=ctxOrd;updEntDirect(wid,sid,idx,'orderId',ctxOrd);}
   const ordOpts=DB.orders.filter(o=>o.status==='active').map(o=>`<option value="${H(o.id)}" ${o.id===(entry.orderId||ctxOrd)?'selected':''}>${H(o.id)}</option>`).join('');
+  const isDefault=(DB.workerSlotOrders[wid]||{})[sid]===(entry.orderId||ctxOrd)&&(entry.orderId||ctxOrd);
   const curPart=H(entry.part||'');
   return`<div class="prow" id="prow_${uid}">
-    <select id="po_${uid}" style="flex:1;font-size:11px;padding:3px" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="orderId" onchange="updEnt(this)"><option value="">Ord</option>${ordOpts}</select>
+    <select id="po_${uid}" style="flex:1;font-size:11px;padding:3px" data-wid="${wid}" data-sid="${sid}" data-idx="${idx}" data-field="orderId" onchange="updEnt(this);showSetDefault('${uid}','${wid}','${sid}')"><option value="">Ord</option>${ordOpts}</select>
+    <span id="sd_${uid}" title="${isDefault?'Default order for this slot — click to clear':'Set as default order for this slot'}" onclick="${isDefault?`clearWorkerSlotOrder('${wid}','${sid}','${uid}')`:`doSetDefault('${wid}','${sid}','${uid}')`}" style="cursor:pointer;font-size:12px;padding:0 2px;flex-shrink:0;opacity:${isDefault?'1':'0.3'};color:${isDefault?'var(--ac)':'var(--tx3)'}" title="Set as default for this slot">&#9733;</span>
     <div class="part-search-wrap" id="psw_${uid}">
       <input type="text" id="pp_${uid}" class="part-search-input" placeholder="Part..." value="${curPart}"
         autocomplete="off"
-        data-wid="${wid}" data-sid="${sid}" data-idx="${idx}"
+        data-wid="${wid}" data-sid="${sid}" data-idx="${uid.split('_').pop()}"
         oninput="partSearch(this)"
         onfocus="partSearch(this)"
         onblur="setTimeout(()=>closePartDrop('${uid}'),200)"
@@ -1253,6 +1264,40 @@ function partSearchKey(e,uid){
   else if(e.key==='Escape'){closePartDrop(uid);}
 }
 
+// Save the order selection as the default for this worker+slot
+function setWorkerSlotOrder(wid, sid, orderId){
+  if(!DB.workerSlotOrders[wid])DB.workerSlotOrders[wid]={};
+  DB.workerSlotOrders[wid][sid]=orderId;
+  saveSync();
+  toast('Default order set for this slot ✓');
+}
+function doSetDefault(wid, sid, uid){
+  const sel=document.getElementById('po_'+uid);
+  const ordId=sel?sel.value:'';
+  if(!ordId){toast('Select an order first');return;}
+  setWorkerSlotOrder(wid,sid,ordId);
+  // Update star appearance
+  const star=document.getElementById('sd_'+uid);
+  if(star){star.style.opacity='1';star.style.color='var(--ac)';star.title='Default order for this slot — click to clear';star.onclick=()=>clearWorkerSlotOrder(wid,sid,uid);}
+}
+function clearWorkerSlotOrder(wid, sid, uid){
+  if(DB.workerSlotOrders[wid])delete DB.workerSlotOrders[wid][sid];
+  saveSync();
+  toast('Slot default cleared');
+  const star=document.getElementById('sd_'+uid);
+  if(star){star.style.opacity='0.3';star.style.color='var(--tx3)';star.title='Set as default order for this slot';star.onclick=()=>doSetDefault(wid,sid,uid);}
+}
+function showSetDefault(uid,wid,sid){
+  // After order changes, check if new value matches default
+  const sel=document.getElementById('po_'+uid);
+  const star=document.getElementById('sd_'+uid);
+  if(!sel||!star)return;
+  const cur=sel.value;
+  const def=(DB.workerSlotOrders[wid]||{})[sid]||'';
+  if(cur&&cur===def){star.style.opacity='1';star.style.color='var(--ac)';}
+  else{star.style.opacity='0.35';star.style.color='var(--tx3)';}
+}
+
 function updEntDirect(wid,sid,idx,field,val){
   const ds=window._pD||today();
   if(!DB.prodLog[ds])DB.prodLog[ds]={};if(!DB.prodLog[ds][wid])DB.prodLog[ds][wid]={};if(!DB.prodLog[ds][wid][sid])DB.prodLog[ds][wid][sid]=[];
@@ -1296,6 +1341,51 @@ function setFullDayLeave(cb){
 
 function savePL(){saveSync();toast('Production log saved!');}
 
+// Toggle individual worker visibility in production log
+function toggleWorkerVis(wid){
+  const el=document.getElementById('wb_'+wid);
+  if(!el)return;
+  hiddenWorkers.add(wid);
+  el.style.display='none';
+  updateHiddenBanner();
+}
+
+function showAllWorkers(){
+  hiddenWorkers.clear();
+  document.querySelectorAll('[id^="wb_"]').forEach(el=>el.style.display='');
+  updateHiddenBanner();
+}
+
+function autoHideOnLeave(ds){
+  const leaveForDay=DB.leaveLog?.[ds]||{};
+  const wsl=DB.timeSlots.filter(s=>s.type==='work');
+  let count=0;
+  DB.workers.forEach(w=>{
+    const isFD=HOURLY_DEPTS.includes(w.dept)&&wsl.every(s=>leaveForDay[w.id]?.[s.id]===true);
+    if(isFD){
+      hiddenWorkers.add(w.id);
+      const el=document.getElementById('wb_'+w.id);
+      if(el)el.style.display='none';
+      count++;
+    }
+  });
+  updateHiddenBanner();
+  toast(count>0?`${count} on-leave worker${count>1?'s':''} hidden`:'No full-day leave workers found');
+}
+
+function updateHiddenBanner(){
+  const existing=document.getElementById('hiddenBanner');
+  if(hiddenWorkers.size===0){if(existing)existing.remove();return;}
+  const content=document.getElementById('mainContent');if(!content)return;
+  const msg=`${hiddenWorkers.size} worker${hiddenWorkers.size>1?'s':''} hidden. <a href="#" onclick="showAllWorkers();return false;" style="color:var(--ac);text-decoration:underline">Show all</a>`;
+  if(existing){existing.innerHTML=msg;return;}
+  const banner=document.createElement('div');
+  banner.id='hiddenBanner';
+  banner.style.cssText='position:sticky;top:52px;z-index:70;background:rgba(245,166,35,.12);border-bottom:1px solid rgba(245,166,35,.25);padding:6px 26px;font-size:12px;color:var(--ac);';
+  banner.innerHTML=msg;
+  const ctx=content.querySelector('.order-ctx-bar');
+  if(ctx)ctx.after(banner);else{const pc=content.querySelector('.ph');if(pc)pc.after(banner);}
+}
 // Refresh just the context bar badge without full page reload
 function refreshOrderCtx(){
   const sel=document.getElementById('pOrdSel');
